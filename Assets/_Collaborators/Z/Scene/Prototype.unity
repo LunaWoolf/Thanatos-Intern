@@ -1067,7 +1067,7 @@ MonoBehaviour:
   - {fileID: 1202600432}
   - {fileID: 2136287465}
   - {fileID: 631964987}
-  ChoiceRates: 03000000030000000300000001000000010000000100000001000000010000000100000003000000
+  ChoiceRates: 03000000030000000300000001000000010000000100000001000000010000000100000002000000
   DeathTime: 6
   DeathTimeText: {fileID: 531576909}
   NewCharacterTime: 5
@@ -1449,7 +1449,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Passion
+  m_text: Reason
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: afd12f57f7d1b0a4a8d862f487b5d6e8, type: 2}
   m_sharedMaterial: {fileID: -4790383527398798850, guid: afd12f57f7d1b0a4a8d862f487b5d6e8, type: 2}
@@ -1638,7 +1638,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d9d5a4984eb67c3458a67cd86a275052, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Content: (Both) Reveal
+  Content: Reveal 1
 --- !u!1 &640844720
 GameObject:
   m_ObjectHideFlags: 0
@@ -3380,12 +3380,12 @@ MonoBehaviour:
   - {x: 38, y: 3}
   ValuePool:
   - {x: 1, y: 1}
-  - {x: 2, y: 2}
-  - {x: 3, y: 2}
-  - {x: 4, y: 2}
-  - {x: 5, y: 2}
-  - {x: 6, y: 2}
-  - {x: 7, y: 2}
+  - {x: 2, y: 1}
+  - {x: 3, y: 1}
+  - {x: 4, y: 1}
+  - {x: 5, y: 1}
+  - {x: 6, y: 1}
+  - {x: 7, y: 1}
   - {x: 8, y: 2}
   - {x: 9, y: 2}
   - {x: 10, y: 2}
@@ -3399,7 +3399,7 @@ MonoBehaviour:
   - {x: 18, y: 3}
   - {x: 19, y: 2}
   - {x: 20, y: 1}
-  HiddenRate: 0.1
+  HiddenRate: 0.2
   PersistRate: 0
 --- !u!1 &1857497351
 GameObject:
