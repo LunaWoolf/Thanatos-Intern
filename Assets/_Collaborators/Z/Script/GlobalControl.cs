@@ -16,7 +16,7 @@ namespace THAN
         public List<EventChoice> Choices;
         public List<int> ChoiceRates;
         [Space]
-        public int DeathTime = 6;
+        public int DeathTime = 4;
         public TextMeshPro DeathTimeText;
         [Space]
         public int NewCharacterTime = 5;
@@ -61,7 +61,7 @@ namespace THAN
             }
             if (NewCharacterTime <= 0)
             {
-                NewCharacterTime = 6;
+                NewCharacterTime = 7;
                 NewCharacter();
             }
             GenerateEvent();

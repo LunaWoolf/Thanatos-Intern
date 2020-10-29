@@ -168,6 +168,8 @@ namespace THAN
         public void ChangeVitality(float Value)
         {
             Vitality += Value;
+            if (Vitality < 1)
+                Vitality = 1;
         }
 
         public float GetVitality()
@@ -178,6 +180,8 @@ namespace THAN
         public void ChangePassion(float Value)
         {
             Passion += Value;
+            if (Passion < 1)
+                Passion = 1;
         }
 
         public float GetPassion()
@@ -188,6 +192,8 @@ namespace THAN
         public void ChangeReason(float Value)
         {
             Reason += Value;
+            if (Reason < 1)
+                Reason = 1;
         }
 
         public float GetReason()
