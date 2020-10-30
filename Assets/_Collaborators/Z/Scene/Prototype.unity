@@ -4211,7 +4211,7 @@ MonoBehaviour:
   - {x: 18, y: 3}
   - {x: 19, y: 2}
   - {x: 20, y: 1}
-  HiddenRate: 0.25
+  HiddenRate: 0
   PersistRate: 0
 --- !u!4 &1920331722 stripped
 Transform:
