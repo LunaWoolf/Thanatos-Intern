@@ -19,30 +19,29 @@ namespace THAN
         // Update is called once per frame
         void Update()
         {
-            if (Index == 1)
+            if (!GetChoice())
             {
-                if (!B.EC1)
-                    Text.text = "";
-                else
-                    Text.text = B.EC1.Content;
+                Text.text = "";
             }
-            else if (Index == 2)
+            else
             {
-                if (!B.EC2)
-                    Text.text = "";
-                else
-                    Text.text = B.EC2.Content;
+                EventChoice EC = GetChoice();
+                Text.text = "[" + EC.GetContent() + "]";
             }
+        }
+
+        public EventChoice GetChoice()
+        {
+            if (!B.GetEvent())
+                return null;
+            return B.GetEvent().GetChoice(Index);
         }
 
         public void OnMouseDown()
         {
-            if ((Index == 1 && !B.EC1) || (Index == 2 && !B.EC2))
+            if (!GetChoice())
                 return;
-            if (Index == 1)
-                B.EC1.Effect(B);
-            else if (Index == 2)
-                B.EC2.Effect(B);
+            GetChoice().Effect(B);
             B.EmptyEvent();
         }
     }

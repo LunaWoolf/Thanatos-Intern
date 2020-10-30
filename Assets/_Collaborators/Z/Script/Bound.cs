@@ -1,14 +1,17 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 namespace THAN
 {
     public class Bound : MonoBehaviour {
         public Slot S1;
         public Slot S2;
-        public EventChoice EC1;
-        public EventChoice EC2;
+        [Space]
+        public Event E;
+        public GameObject EventBase;
+        public TextMeshPro TitleText;
 
         // Start is called before the first frame update
         void Start()
@@ -19,7 +22,21 @@ namespace THAN
         // Update is called once per frame
         void Update()
         {
+            Render();
+        }
 
+        public void Render()
+        {
+            if (!GetEvent())
+            {
+                TitleText.text = "";
+                EventBase.SetActive(false);
+            }
+            else
+            {
+                TitleText.text = GetEvent().GetTitle();
+                EventBase.SetActive(true);
+            }
         }
 
         public void Effect()
@@ -40,13 +57,12 @@ namespace THAN
 
         public void EmptyEvent()
         {
-            EC1 = null;
-            EC2 = null;
+            E = null;
         }
 
-        public bool HasEvent()
+        public Event GetEvent()
         {
-            return EC1 || EC2;
+            return E;
         }
     }
 }

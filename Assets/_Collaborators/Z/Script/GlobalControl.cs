@@ -15,6 +15,7 @@ namespace THAN
         [Space]
         public List<EventChoice> Choices;
         public List<int> ChoiceRates;
+        public List<Event> Events;
         [Space]
         public int DeathTime = 4;
         public TextMeshPro DeathTimeText;
@@ -26,7 +27,7 @@ namespace THAN
         // Start is called before the first frame update
         void Start()
         {
-            for (int i = 0; i < 6; i++)
+            for (int i = 0; i < 5; i++)
                 NewCharacter();
         }
 
@@ -40,7 +41,7 @@ namespace THAN
         {
             foreach (Bound B in Bounds)
             {
-                if (B.HasEvent())
+                if (B.GetEvent())
                     return;
             }
 
@@ -52,7 +53,7 @@ namespace THAN
             if (DeathSlot.GetCharacter())
             {
                 Character C = DeathSlot.GetCharacter();
-                if (C.GetVitality() <= 10 && C.GetPassion() <= 10 && C.GetReason() <= 10)
+                if (C.CanDie())
                 {
                     Destroy(C.gameObject);
                     DeathSlot.Empty();
@@ -68,6 +69,21 @@ namespace THAN
         }
 
         public void GenerateEvent()
+        {
+            List<Bound> Bs = new List<Bound>();
+            foreach (Bound Bo in Bounds)
+            {
+                if (Bo.S1.GetCharacter() && Bo.S2.GetCharacter())
+                    Bs.Add(Bo);
+            }
+            if (Bs.Count <= 0)
+                return;
+            Bound B = Bs[Random.Range(0, Bs.Count)];
+
+            B.E = Events[Random.Range(0, Events.Count)];
+        }
+
+        /*public void GenerateEvent()
         {
             List<Bound> Bs = new List<Bound>();
             foreach (Bound Bo in Bounds)
@@ -101,7 +117,7 @@ namespace THAN
                 return;
             }
             B.EC2 = ECs[Random.Range(0, ECs.Count)];
-        }
+        }*/
 
         public bool CanEndTurn()
         {

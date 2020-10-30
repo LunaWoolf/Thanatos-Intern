@@ -6,11 +6,7 @@ using TMPro;
 namespace THAN
 {
     public class Character : MonoBehaviour {
-        public float Vitality;
-        public float Passion;
-        public float Reason;
-        public Vector3 Hidden;
-        public Vector3 Persist;
+        public CharacterInfo Info;
         [Space]
         public TextMeshPro VitalityText;
         public TextMeshPro PassionText;
@@ -35,7 +31,7 @@ namespace THAN
 
         public void Render()
         {
-            if (Hidden.x == 0)
+            if (!GetHidden_Vitality())
             {
                 VitalityText.text = GetVitality() + "";
                 if (GetVitality() == 10)
@@ -44,7 +40,7 @@ namespace THAN
                     VitalityText.color = Green;
                 else
                     VitalityText.color = Red;
-                if (Persist.x == 1)
+                if (GetPersist_Vitality())
                     VitalityText.text = "[" + VitalityText.text + "]";
             }
             else
@@ -53,7 +49,7 @@ namespace THAN
                 VitalityText.color = Normal;
             }
 
-            if (Hidden.y == 0)
+            if (!GetHidden_Passion())
             {
                 PassionText.text = GetPassion() + "";
                 if (GetPassion() == 10)
@@ -62,7 +58,7 @@ namespace THAN
                     PassionText.color = Green;
                 else
                     PassionText.color = Red;
-                if (Persist.y == 1)
+                if (GetPersist_Passion())
                     PassionText.text = "[" + PassionText.text + "]";
             }
             else
@@ -71,7 +67,7 @@ namespace THAN
                 PassionText.color = Normal;
             }
 
-            if (Hidden.z == 0)
+            if (!GetHidden_Reason())
             {
                 ReasonText.text = GetReason() + "";
                 if (GetReason() == 10)
@@ -80,7 +76,7 @@ namespace THAN
                     ReasonText.color = Green;
                 else
                     ReasonText.color = Red;
-                if (Persist.z == 1)
+                if (GetPersist_Reason())
                     ReasonText.text = "[" + ReasonText.text + "]";
             }
             else
@@ -102,103 +98,188 @@ namespace THAN
         {
             if (V > GetVitality() + 1)
             {
-                if (Persist.x == 1)
+                if (GetPersist_Vitality())
                     ChangeVitality(Random.Range(0, 2));
                 else
                     ChangeVitality(1);
             }
             else if (V < GetVitality() - 1)
             {
-                if (Persist.x == 1)
+                if (GetPersist_Vitality())
                     ChangeVitality(Random.Range(0, -2));
                 else
                     ChangeVitality(-1);
             }
-            else if (Hidden.x == 1)
+            else if (GetHidden_Vitality())
             {
-                Hidden.x = 0;
+                SetHidden_Vitality(false);
             }
 
             if (P > GetPassion() + 1)
             {
-                if (Persist.y == 1)
+                if (GetPersist_Passion())
                     ChangePassion(Random.Range(0, 2));
                 else
                     ChangePassion(1);
             }
             else if (P < GetPassion() - 1)
             {
-                if (Persist.y == 1)
+                if (GetPersist_Passion())
                     ChangePassion(Random.Range(0, -2));
                 else
                     ChangePassion(-1);
             }
-            else if (Hidden.y == 1)
+            else if (GetHidden_Passion())
             {
-                Hidden.y = 0;
+                SetHidden_Passion(false);
             }
 
             if (R > GetReason() + 1)
             {
-                if (Persist.z == 1)
+                if (GetPersist_Reason())
                     ChangeReason(Random.Range(0, 2));
                 else
                     ChangeReason(1);
             }
             else if (R < GetReason() - 1)
             {
-                if (Persist.z == 1)
+                if (GetPersist_Reason())
                     ChangeReason(Random.Range(0, -2));
                 else
                     ChangeReason(-1);
             }
-            else if (Hidden.z == 1)
+            else if (GetHidden_Reason())
             {
-                Hidden.z = 0;
+                SetHidden_Reason(false);
             }
+        }
+
+        public bool CanDie()
+        {
+            return GetVitality() <= 10 && GetPassion() <= 10 && GetReason() <= 10;
         }
 
         public void IniStat(float V, float P, float R)
         {
-            Vitality = V;
-            Passion = P;
-            Reason = R;
+            SetVitality(V);
+            SetPassion(P);
+            SetReason(R);
         }
+
+        //-------------------------------------------------------------------------------------------------------------
 
         public void ChangeVitality(float Value)
         {
-            Vitality += Value;
-            if (Vitality < 1)
-                Vitality = 1;
+            float a = Info.Vitality + Value;
+            if (a < 1)
+                a = 1;
+            SetVitality(a);
         }
 
-        public float GetVitality()
+        public void SetVitality(float Value)
         {
-            return Vitality;
+            Info.SetVitality(Value);
         }
 
         public void ChangePassion(float Value)
         {
-            Passion += Value;
-            if (Passion < 1)
-                Passion = 1;
+            float a = Info.Passion + Value;
+            if (a < 1)
+                a = 1;
+            SetPassion(a);
         }
 
-        public float GetPassion()
+        public void SetPassion(float Value)
         {
-            return Passion;
+            Info.SetPassion(Value);
         }
 
         public void ChangeReason(float Value)
         {
-            Reason += Value;
-            if (Reason < 1)
-                Reason = 1;
+            float a = Info.Reason + Value;
+            if (a < 1)
+                a = 1;
+            SetReason(a);
+        }
+
+        public void SetReason(float Value)
+        {
+            Info.SetReason(Value);
+        }
+
+        public void SetHidden_Vitality(bool Value)
+        {
+            Info.SetHidden_Vitality(Value);
+        }
+
+        public void SetHidden_Passion(bool Value)
+        {
+            Info.SetHidden_Passion(Value);
+        }
+
+        public void SetHidden_Reason(bool Value)
+        {
+            Info.SetHidden_Reason(Value);
+        }
+
+        public void SetPersist_Vitality(bool Value)
+        {
+            Info.SetPersist_Vitality(Value);
+        }
+
+        public void SetPersist_Passion(bool Value)
+        {
+            Info.SetPersist_Passion(Value);
+        }
+
+        public void SetPersist_Reason(bool Value)
+        {
+            Info.SetPersist_Reason(Value);
+        }
+
+        public float GetVitality()
+        {
+            return Info.Vitality;
+        }
+
+        public float GetPassion()
+        {
+            return Info.Passion;
         }
 
         public float GetReason()
         {
-            return Reason;
+            return Info.Reason;
+        }
+
+        public bool GetHidden_Vitality()
+        {
+            return Info.Hidden_Vitality;
+        }
+
+        public bool GetHidden_Passion()
+        {
+            return Info.Hidden_Passion;
+        }
+
+        public bool GetHidden_Reason()
+        {
+            return Info.Hidden_Reason;
+        }
+
+        public bool GetPersist_Vitality()
+        {
+            return Info.Persist_Vitality;
+        }
+
+        public bool GetPersist_Passion()
+        {
+            return Info.Persist_Passion;
+        }
+
+        public bool GetPersist_Reason()
+        {
+            return Info.Persist_Reason;
         }
     }
 }
