@@ -270,7 +270,7 @@ GameObject:
   - component: {fileID: 48837835}
   - component: {fileID: 48837836}
   m_Layer: 0
-  m_Name: V+3, P-3
+  m_Name: V-3, P+3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -302,9 +302,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e27fdfa7eca6e544989aedcaa92da87, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Content: (Both) Vitality +3, Passion -3
-  ChangeA: {x: 3, y: -3, z: 0}
-  ChangeB: {x: 3, y: -3, z: 0}
+  Content: (Both) Vitality -3, Passion +3
+  ChangeA: {x: -3, y: 3, z: 0}
+  ChangeB: {x: -3, y: 3, z: 0}
 --- !u!4 &123635506 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7815556944893554892, guid: 3a93c1ec3e6d5614bafdf2b0c8d228f9, type: 3}
@@ -589,7 +589,7 @@ GameObject:
   - component: {fileID: 226375038}
   - component: {fileID: 226375039}
   m_Layer: 0
-  m_Name: P+3, V-3
+  m_Name: P-3, V+3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -621,9 +621,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e27fdfa7eca6e544989aedcaa92da87, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Content: (Both) Passion +3, Vitality -3
-  ChangeA: {x: -3, y: 3, z: 0}
-  ChangeB: {x: -3, y: 3, z: 0}
+  Content: (Both) Passion -3, Vitality +3
+  ChangeA: {x: 3, y: -3, z: 0}
+  ChangeB: {x: 3, y: -3, z: 0}
 --- !u!1001 &250779476
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1140,7 +1140,7 @@ GameObject:
   - component: {fileID: 450192961}
   - component: {fileID: 450192962}
   m_Layer: 0
-  m_Name: P++
+  m_Name: P--
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1174,7 +1174,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8789aa459a0220c4b8c0db8517bf2d18, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Title: P++
+  Title: P--
   Choices:
   - {fileID: 734811682}
   - {fileID: 226375039}
@@ -1312,9 +1312,6 @@ MonoBehaviour:
   - {fileID: 364909557}
   - {fileID: 1695631110}
   - {fileID: 584365944}
-  - {fileID: 622865394}
-  - {fileID: 450192962}
-  - {fileID: 1946313182}
   DeathTime: 6
   DeathTimeText: {fileID: 531576909}
   NewCharacterTime: 5
@@ -1551,7 +1548,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_enableWordWrapping: 1
+  m_enableWordWrapping: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -1948,7 +1945,7 @@ GameObject:
   - component: {fileID: 622865393}
   - component: {fileID: 622865394}
   m_Layer: 0
-  m_Name: V++
+  m_Name: V--
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1982,7 +1979,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8789aa459a0220c4b8c0db8517bf2d18, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Title: V++
+  Title: V--
   Choices:
   - {fileID: 48837836}
   - {fileID: 1612669205}
@@ -1997,7 +1994,7 @@ GameObject:
   - component: {fileID: 627215930}
   - component: {fileID: 627215931}
   m_Layer: 0
-  m_Name: R+3, P-3
+  m_Name: R-3, P+3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2029,9 +2026,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e27fdfa7eca6e544989aedcaa92da87, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Content: (Both) Reason +3, Passion -3
-  ChangeA: {x: 0, y: -3, z: 3}
-  ChangeB: {x: 0, y: -3, z: 3}
+  Content: (Both) Reason -3, Passion +3
+  ChangeA: {x: 0, y: 3, z: -3}
+  ChangeB: {x: 0, y: 3, z: -3}
 --- !u!1 &640844720
 GameObject:
   m_ObjectHideFlags: 0
@@ -2450,7 +2447,7 @@ GameObject:
   - component: {fileID: 734811681}
   - component: {fileID: 734811682}
   m_Layer: 0
-  m_Name: P+3, R-3
+  m_Name: P-3, R+3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2482,9 +2479,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e27fdfa7eca6e544989aedcaa92da87, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Content: (Both) Passion +3, Reason -3
-  ChangeA: {x: 0, y: 3, z: -3}
-  ChangeB: {x: 0, y: 3, z: -3}
+  Content: (Both) Passion -3, Reason +3
+  ChangeA: {x: 0, y: -3, z: 3}
+  ChangeB: {x: 0, y: -3, z: 3}
 --- !u!1001 &748191049
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2873,7 +2870,7 @@ GameObject:
   - component: {fileID: 1061358758}
   - component: {fileID: 1061358759}
   m_Layer: 0
-  m_Name: R+3, V-3
+  m_Name: R-3, V+3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2905,9 +2902,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e27fdfa7eca6e544989aedcaa92da87, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Content: (Both) Reason +3, Vitality -3
-  ChangeA: {x: -3, y: 0, z: 3}
-  ChangeB: {x: -3, y: 0, z: 3}
+  Content: (Both) Reason -3, Vitality +3
+  ChangeA: {x: 3, y: 0, z: -3}
+  ChangeB: {x: 3, y: 0, z: -3}
 --- !u!1 &1156968682
 GameObject:
   m_ObjectHideFlags: 0
@@ -3701,7 +3698,7 @@ GameObject:
   - component: {fileID: 1612669204}
   - component: {fileID: 1612669205}
   m_Layer: 0
-  m_Name: V+3, R-3
+  m_Name: V-3, R+3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3733,9 +3730,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e27fdfa7eca6e544989aedcaa92da87, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Content: (Both) Vitality +3, Reason -3
-  ChangeA: {x: 3, y: 0, z: -3}
-  ChangeB: {x: 3, y: 0, z: -3}
+  Content: (Both) Vitality -3, Reason +3
+  ChangeA: {x: -3, y: 0, z: 3}
+  ChangeB: {x: -3, y: 0, z: 3}
 --- !u!1001 &1614842962
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4211,7 +4208,7 @@ MonoBehaviour:
   - {x: 18, y: 3}
   - {x: 19, y: 2}
   - {x: 20, y: 1}
-  HiddenRate: 0
+  HiddenRate: 0.2
   PersistRate: 0
 --- !u!4 &1920331722 stripped
 Transform:
@@ -4229,7 +4226,7 @@ GameObject:
   - component: {fileID: 1946313181}
   - component: {fileID: 1946313182}
   m_Layer: 0
-  m_Name: R++
+  m_Name: R--
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4263,7 +4260,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8789aa459a0220c4b8c0db8517bf2d18, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Title: R++
+  Title: R--
   Choices:
   - {fileID: 1061358759}
   - {fileID: 627215931}
