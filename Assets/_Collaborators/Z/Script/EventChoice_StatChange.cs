@@ -13,17 +13,17 @@ namespace THAN
             Character I = B.S1.GetCharacter();
             Character II = B.S2.GetCharacter();
 
-            if (ChangeA.x != 0 && I.Hidden.x != 0)
+            if (ChangeA.x != 0 && I.GetHidden_Vitality())
                 return false;
-            if (ChangeA.y != 0 && I.Hidden.y != 0)
+            if (ChangeA.y != 0 && I.GetHidden_Passion())
                 return false;
-            if (ChangeA.z != 0 && I.Hidden.z != 0)
+            if (ChangeA.z != 0 && I.GetHidden_Reason())
                 return false;
-            if (ChangeB.x != 0 && II.Hidden.x != 0)
+            if (ChangeB.x != 0 && II.GetHidden_Vitality())
                 return false;
-            if (ChangeB.y != 0 && II.Hidden.y != 0)
+            if (ChangeB.y != 0 && II.GetHidden_Passion())
                 return false;
-            if (ChangeB.z != 0 && II.Hidden.z != 0)
+            if (ChangeB.z != 0 && II.GetHidden_Reason())
                 return false;
             return true;
         }

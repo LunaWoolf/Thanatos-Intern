@@ -41,7 +41,7 @@ namespace THAN
 
         public void OnMouseDown()
         {
-            if (B && B.HasEvent())
+            if (B && B.GetEvent())
                 return;
             GlobalControl.Main.SlotExchange(this, Cursor.GetCursorSlot());
         }

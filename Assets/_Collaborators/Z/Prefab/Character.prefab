@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3207418462324221637}
   - component: {fileID: 3207418462324221634}
+  - component: {fileID: 1907539348224468110}
   m_Layer: 0
   m_Name: Character
   m_TagString: Untagged
@@ -47,11 +48,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8612ce65373513849abf02352ee964bb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Vitality: 0
-  Passion: 0
-  Reason: 0
-  Hidden: {x: 0, y: 0, z: 0}
-  Persist: {x: 0, y: 0, z: 0}
+  Info: {fileID: 1907539348224468110}
   VitalityText: {fileID: 3207418463383677010}
   PassionText: {fileID: 3207418463375492861}
   ReasonText: {fileID: 3207418462974425254}
@@ -59,6 +56,27 @@ MonoBehaviour:
   Red: {r: 0.74509805, g: 0.17254902, b: 0.2267726, a: 1}
   Normal: {r: 1, g: 1, b: 1, a: 1}
   CurrentSlot: {fileID: 0}
+--- !u!114 &1907539348224468110
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3207418462324221636}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5721ce7199be9943bc9cd582e630ea7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Vitality: 0
+  Passion: 0
+  Reason: 0
+  Hidden_Vitality: 0
+  Hidden_Passion: 0
+  Hidden_Reason: 0
+  Persist_Vitality: 0
+  Persist_Passion: 0
+  Persist_Reason: 0
 --- !u!1 &3207418462415738539
 GameObject:
   m_ObjectHideFlags: 0

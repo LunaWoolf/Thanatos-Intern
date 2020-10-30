@@ -36,46 +36,47 @@ namespace THAN
                     SP.Add((int)V.x);
             }
             int Sum = SP[Random.Range(0, SP.Count)];
+            int I = Random.Range(1, Sum);
+            int II = Random.Range(1, Sum);
+            if (I > II)
+            {
+                int III = I;
+                I = II;
+                II = III;
+            }
+            Temp.x = I;
+            Temp.y = II - I;
+            if (Temp.y <= 0)
+                Temp.y = Random.Range(1, 4);
+            Temp.z = Sum - II;
+            C.IniStat(Temp.x, Temp.y, Temp.z);
             for (int i = 0; i < 3; i++)
             {
-                int Index = Indexs[Random.Range(0, Indexs.Count)];
-                for (int j = Indexs.Count - 1; j >= 0; j--)
-                {
-                    if (Indexs[j] == Index)
-                        Indexs.RemoveAt(j);
-                }
-                int F = GenerateInidividualStat(Sum);
+                int Index = i;
                 bool Hidden = Random.Range(0.01f, 0.99f) < HiddenRate;
                 bool Persist = Random.Range(0.01f, 0.99f) < PersistRate;
                 if (Index == 0)
                 {
-                    Temp.x = F;
                     if (Hidden)
-                        C.Hidden.x = 1;
+                        C.SetHidden_Vitality(true);
                     if (Persist)
-                        C.Persist.x = 1;
+                        C.SetPersist_Vitality(true);
                 }
                 else if (Index == 1)
                 {
-                    Temp.y = F;
                     if (Hidden)
-                        C.Hidden.y = 1;
+                        C.SetHidden_Passion(true);
                     if (Persist)
-                        C.Persist.y = 1;
+                        C.SetPersist_Passion(true);
                 }
                 else if (Index == 2)
                 {
-                    Temp.z = F;
                     if (Hidden)
-                        C.Hidden.z = 1;
+                        C.SetHidden_Reason(true);
                     if (Persist)
-                        C.Persist.z = 1;
+                        C.SetPersist_Reason(true);
                 }
-                Sum -= F;
-                if (Sum <= 0)
-                    Sum++;
             }
-            C.IniStat(Temp.x, Temp.y, Temp.z);
         }
 
         public int GenerateInidividualStat(int Sum)

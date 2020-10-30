@@ -59,8 +59,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 12.5, y: 2.77, z: 1}
-  m_Center: {x: -5.75, y: 0, z: 0}
+  m_Size: {x: 27.15, y: 2.77, z: 1}
+  m_Center: {x: -13, y: 0, z: 0}
 --- !u!1 &1547115391128225382
 GameObject:
   m_ObjectHideFlags: 0
@@ -159,7 +159,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Event
+  m_text: '[Event]'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: afd12f57f7d1b0a4a8d862f487b5d6e8, type: 2}
   m_sharedMaterial: {fileID: -4790383527398798850, guid: afd12f57f7d1b0a4a8d862f487b5d6e8, type: 2}

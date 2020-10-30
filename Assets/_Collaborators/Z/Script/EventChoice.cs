@@ -7,14 +7,19 @@ namespace THAN
     public class EventChoice : MonoBehaviour {
         public string Content;
 
+        public virtual void Effect(Bound B)
+        {
+
+        }
+
         public virtual bool Pass(Bound B)
         {
             return true;
         }
 
-        public virtual void Effect(Bound B)
+        public string GetContent()
         {
-
+            return Content;
         }
     }
 }
