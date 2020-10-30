@@ -28,7 +28,7 @@ namespace THAN
         void Start()
         {
             for (int i = 0; i < 5; i++)
-                NewCharacter();
+                NewCharacter(i + 1);
         }
 
         // Update is called once per frame
@@ -63,7 +63,7 @@ namespace THAN
             if (NewCharacterTime <= 0)
             {
                 NewCharacterTime = 7;
-                NewCharacter();
+                NewCharacter(0);
             }
             GenerateEvent();
         }
@@ -157,13 +157,13 @@ namespace THAN
             return null;
         }
 
-        public void NewCharacter()
+        public void NewCharacter(int Seed)
         {
             if (!GetNextSlot())
                 return;
             GameObject G = Instantiate(CharacterPrefab);
             Character C = G.GetComponent<Character>();
-            Generator.GenerateValue(C);
+            Generator.GenerateValue(C, Seed);
             GetNextSlot().AssignCharacter(C);
         }
     }

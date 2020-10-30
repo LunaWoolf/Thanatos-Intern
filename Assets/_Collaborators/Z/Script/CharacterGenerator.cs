@@ -22,34 +22,57 @@ namespace THAN
 
         }
 
-        public void GenerateValue(Character C)
+        public void GenerateValue(Character C, int Seed)
         {
-            Vector3Int Temp = new Vector3Int();
-            List<int> SP = new List<int>();
-            List<int> Indexs = new List<int>();
-            Indexs.Add(0);
-            Indexs.Add(1);
-            Indexs.Add(2);
-            foreach (Vector2 V in SumPool)
+            if (Seed == 0)
             {
-                for (int i = 0; i < V.y; i++)
-                    SP.Add((int)V.x);
+                Vector3Int Temp = new Vector3Int();
+                List<int> SP = new List<int>();
+                List<int> Indexs = new List<int>();
+                Indexs.Add(0);
+                Indexs.Add(1);
+                Indexs.Add(2);
+                foreach (Vector2 V in SumPool)
+                {
+                    for (int i = 0; i < V.y; i++)
+                        SP.Add((int)V.x);
+                }
+                int Sum = SP[Random.Range(0, SP.Count)];
+                int I = Random.Range(1, Sum);
+                int II = Random.Range(1, Sum);
+                if (I > II)
+                {
+                    int III = I;
+                    I = II;
+                    II = III;
+                }
+                Temp.x = I;
+                Temp.y = II - I;
+                if (Temp.y <= 0)
+                    Temp.y = Random.Range(1, 4);
+                Temp.z = Sum - II;
+                C.IniStat(Temp.x, Temp.y, Temp.z);
             }
-            int Sum = SP[Random.Range(0, SP.Count)];
-            int I = Random.Range(1, Sum);
-            int II = Random.Range(1, Sum);
-            if (I > II)
+            else if (Seed == 1)
             {
-                int III = I;
-                I = II;
-                II = III;
+                C.IniStat(6, 17, 3);
             }
-            Temp.x = I;
-            Temp.y = II - I;
-            if (Temp.y <= 0)
-                Temp.y = Random.Range(1, 4);
-            Temp.z = Sum - II;
-            C.IniStat(Temp.x, Temp.y, Temp.z);
+            else if (Seed == 2)
+            {
+                C.IniStat(9, 9, 12);
+            }
+            else if (Seed == 3)
+            {
+                C.IniStat(15, 3, 8);
+            }
+            else if (Seed == 4)
+            {
+                C.IniStat(13, 8, 11);
+            }
+            else if (Seed == 5)
+            {
+                C.IniStat(12, 19, 1);
+            }
             for (int i = 0; i < 3; i++)
             {
                 int Index = i;
