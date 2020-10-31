@@ -48,53 +48,80 @@ namespace THAN
                     Temp.y = Random.Range(1, 4);
                 Temp.z = Sum - II;
                 C.IniStat(Temp.x, Temp.y, Temp.z);
+
+                for (int i = 0; i < 3; i++)
+                {
+                    int Index = i;
+                    bool Hidden = Random.Range(0.01f, 0.99f) < HiddenRate;
+                    bool Persist = Random.Range(0.01f, 0.99f) < PersistRate;
+                    if (Index == 0)
+                    {
+                        if (Hidden)
+                            C.SetHidden_Vitality(true);
+                        if (Persist)
+                            C.SetPersist_Vitality(true);
+                    }
+                    else if (Index == 1)
+                    {
+                        if (Hidden)
+                            C.SetHidden_Passion(true);
+                        if (Persist)
+                            C.SetPersist_Passion(true);
+                    }
+                    else if (Index == 2)
+                    {
+                        if (Hidden)
+                            C.SetHidden_Reason(true);
+                        if (Persist)
+                            C.SetPersist_Reason(true);
+                    }
+                }
             }
             else if (Seed == 1)
             {
-                C.IniStat(6, 17, 3);
+                C.IniStat(22, 6, 6);
             }
             else if (Seed == 2)
             {
-                C.IniStat(9, 9, 12);
+                C.IniStat(7, 13, 2);
             }
             else if (Seed == 3)
             {
-                C.IniStat(15, 3, 8);
+                C.IniStat(2, 4, 20);
+                C.SetHidden_Vitality(true);
             }
             else if (Seed == 4)
             {
-                C.IniStat(13, 8, 11);
+                C.IniStat(5, 19, 8);
             }
             else if (Seed == 5)
             {
-                C.IniStat(12, 19, 1);
+                C.IniStat(8, 8, 7);
             }
-            for (int i = 0; i < 3; i++)
+            else if (Seed == 6)
             {
-                int Index = i;
-                bool Hidden = Random.Range(0.01f, 0.99f) < HiddenRate;
-                bool Persist = Random.Range(0.01f, 0.99f) < PersistRate;
-                if (Index == 0)
-                {
-                    if (Hidden)
-                        C.SetHidden_Vitality(true);
-                    if (Persist)
-                        C.SetPersist_Vitality(true);
-                }
-                else if (Index == 1)
-                {
-                    if (Hidden)
-                        C.SetHidden_Passion(true);
-                    if (Persist)
-                        C.SetPersist_Passion(true);
-                }
-                else if (Index == 2)
-                {
-                    if (Hidden)
-                        C.SetHidden_Reason(true);
-                    if (Persist)
-                        C.SetPersist_Reason(true);
-                }
+                C.IniStat(14, 15, 12);
+                C.SetHidden_Vitality(true);
+            }
+            else if (Seed == 7)
+            {
+                C.IniStat(8, 5, 2);
+            }
+            else if (Seed == 8)
+            {
+                C.IniStat(1, 8, 24);
+                C.SetHidden_Reason(true);
+            }
+            else if (Seed == 9)
+            {
+                C.IniStat(14, 3, 13);
+                C.SetHidden_Vitality(true);
+                C.SetHidden_Passion(true);
+                C.SetHidden_Reason(true);
+            }
+            else if (Seed == 10)
+            {
+                C.IniStat(30, 28, 2);
             }
         }
 
@@ -119,7 +146,7 @@ namespace THAN
                 Temp.Add(0);
             for (int i = 0; i < 3; i++)
             {
-                int Sum = Random.Range(46, 51);
+                int Sum = Random.Range(44, 45);
                 List<int> Indexs = new List<int>();
                 Indexs.Add(0);
                 Indexs.Add(Random.Range(1, Sum));
