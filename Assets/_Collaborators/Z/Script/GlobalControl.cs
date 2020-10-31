@@ -17,19 +17,20 @@ namespace THAN
         public List<int> ChoiceRates;
         public List<Event> Events;
         [Space]
-        public int DeathTime = 4;
+        public int DeathTime;
         public TextMeshPro DeathTimeText;
         [Space]
-        public int NewCharacterTime = 5;
+        public int NewCharacterTime;
+        public int NewCharacterIndex = 6;
         public GameObject CharacterPrefab;
         public CharacterGenerator Generator;
         
         // Start is called before the first frame update
         void Start()
         {
-            StartCharacters();
-            //for (int i = 0; i < 5; i++)
-            //    NewCharacter(i + 1);
+            for (int i = 1; i < 6; i++)
+                NewCharacter(i);
+            //StartCharacters();
         }
 
         // Update is called once per frame
@@ -63,10 +64,11 @@ namespace THAN
             }
             if (NewCharacterTime <= 0)
             {
-                NewCharacterTime = 7;
-                NewCharacter(0);
+                NewCharacterTime = 6;
+                NewCharacter(NewCharacterIndex);
+                NewCharacterIndex++;
             }
-            GenerateEvent();
+            //GenerateEvent();
         }
 
         public void GenerateEvent()
@@ -124,6 +126,8 @@ namespace THAN
 
         public void NewCharacter(int Seed)
         {
+            if (Seed > 10)
+                return;
             if (!GetNextSlot())
                 return;
             GameObject G = Instantiate(CharacterPrefab);
@@ -143,8 +147,8 @@ namespace THAN
             int b = a;
             while (b == a)
                 b = Random.Range(0, HiddenStats.Count);
-            HiddenStats[a] = true;
-            HiddenStats[b] = true;
+            HiddenStats[a] = false;
+            HiddenStats[b] = false;
 
             for (int i = 0; i < 5; i++)
             {

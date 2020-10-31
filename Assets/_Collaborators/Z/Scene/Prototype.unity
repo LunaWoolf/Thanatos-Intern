@@ -1314,7 +1314,8 @@ MonoBehaviour:
   - {fileID: 584365944}
   DeathTime: 6
   DeathTimeText: {fileID: 531576909}
-  NewCharacterTime: 5
+  NewCharacterTime: 8
+  NewCharacterIndex: 6
   CharacterPrefab: {fileID: 3207418462324221636, guid: 20dd0820fde9e734b85c804a3d8fb073, type: 3}
   Generator: {fileID: 1823010741}
 --- !u!114 &489226826
@@ -4207,7 +4208,7 @@ MonoBehaviour:
   - {x: 18, y: 3}
   - {x: 19, y: 2}
   - {x: 20, y: 1}
-  HiddenRate: 0.2
+  HiddenRate: 0
   PersistRate: 0
 --- !u!4 &1920331722 stripped
 Transform:
