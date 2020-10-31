@@ -28,10 +28,6 @@ namespace THAN
             {
                 Vector3Int Temp = new Vector3Int();
                 List<int> SP = new List<int>();
-                List<int> Indexs = new List<int>();
-                Indexs.Add(0);
-                Indexs.Add(1);
-                Indexs.Add(2);
                 foreach (Vector2 V in SumPool)
                 {
                     for (int i = 0; i < V.y; i++)
@@ -114,6 +110,52 @@ namespace THAN
                 }
             }
             return SP[Random.Range(0, SP.Count)];
+        }
+
+        public List<int> GenerateStartStats()
+        {
+            List<int> Temp = new List<int>();
+            for (int b = 0; b < 15; b++)
+                Temp.Add(0);
+            for (int i = 0; i < 3; i++)
+            {
+                int Sum = Random.Range(46, 51);
+                List<int> Indexs = new List<int>();
+                Indexs.Add(0);
+                Indexs.Add(Random.Range(1, Sum));
+                Indexs.Add(Random.Range(1, Sum));
+                Indexs.Add(Random.Range(1, Sum));
+                Indexs.Add(Random.Range(1, Sum));
+                Indexs.Add(Sum);
+                bool a = true;
+                while (a)
+                {
+                    a = false;
+                    for (int j = 0; j < Indexs.Count - 1; j++)
+                    {
+                        if (Indexs[j] > Indexs[j + 1])
+                        {
+                            int asd = Indexs[j];
+                            Indexs[j] = Indexs[j + 1];
+                            Indexs[j + 1] = asd;
+                            a = true;
+                        }
+                    }
+                }
+                List<int> TempIndex = new List<int>();
+                for (int y = 0; y < 5; y++)
+                    TempIndex.Add(y);
+                for (int I = 0; I < 5; I++)
+                {
+                    int c = Random.Range(0, TempIndex.Count);
+                    int x = TempIndex[c];
+                    TempIndex.RemoveAt(c);
+                    Temp[x * 3 + i] = Indexs[I + 1] - Indexs[I];
+                    if (Temp[x * 3] <= 0)
+                        Temp[x * 3] = 1;
+                }
+            }
+            return Temp;
         }
     }
 }

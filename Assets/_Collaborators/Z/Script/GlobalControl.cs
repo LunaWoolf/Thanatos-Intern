@@ -23,12 +23,13 @@ namespace THAN
         public int NewCharacterTime = 5;
         public GameObject CharacterPrefab;
         public CharacterGenerator Generator;
-
+        
         // Start is called before the first frame update
         void Start()
         {
-            for (int i = 0; i < 5; i++)
-                NewCharacter(i + 1);
+            StartCharacters();
+            //for (int i = 0; i < 5; i++)
+            //    NewCharacter(i + 1);
         }
 
         // Update is called once per frame
@@ -83,42 +84,6 @@ namespace THAN
             B.E = Events[Random.Range(0, Events.Count)];
         }
 
-        /*public void GenerateEvent()
-        {
-            List<Bound> Bs = new List<Bound>();
-            foreach (Bound Bo in Bounds)
-            {
-                if (Bo.S1.GetCharacter() && Bo.S2.GetCharacter())
-                    Bs.Add(Bo);
-            }
-            if (Bs.Count <= 0)
-                return;
-            Bound B = Bs[Random.Range(0, Bs.Count)];
-            List<EventChoice> ECs = new List<EventChoice>();
-            for (int i = 0; i < Choices.Count; i++)
-            {
-                if (Choices[i].Pass(B))
-                {
-                    for (int j = 0; j < ChoiceRates[i]; j++)
-                        ECs.Add(Choices[i]);
-                }
-            }
-            if (ECs.Count <= 1)
-                return;
-            B.EC1 = ECs[Random.Range(0, ECs.Count)];
-            for (int ii = ECs.Count - 1; ii >= 0; ii--)
-            {
-                if (ECs[ii] == B.EC1)
-                    ECs.RemoveAt(ii);
-            }
-            if (ECs.Count <= 0)
-            {
-                B.EmptyEvent();
-                return;
-            }
-            B.EC2 = ECs[Random.Range(0, ECs.Count)];
-        }*/
-
         public bool CanEndTurn()
         {
             return true;
@@ -165,6 +130,32 @@ namespace THAN
             Character C = G.GetComponent<Character>();
             Generator.GenerateValue(C, Seed);
             GetNextSlot().AssignCharacter(C);
+        }
+
+        public void StartCharacters()
+        {
+            List<int> Stats = Generator.GenerateStartStats();
+
+            List<bool> HiddenStats = new List<bool>();
+            for (int asd = 0; asd < 15; asd++)
+                HiddenStats.Add(false);
+            int a = Random.Range(0, HiddenStats.Count);
+            int b = a;
+            while (b == a)
+                b = Random.Range(0, HiddenStats.Count);
+            HiddenStats[a] = true;
+            HiddenStats[b] = true;
+
+            for (int i = 0; i < 5; i++)
+            {
+                GameObject G = Instantiate(CharacterPrefab);
+                Character C = G.GetComponent<Character>();
+                C.IniStat(Stats[i * 3], Stats[i * 3] + 1, Stats[i * 3 + 2]);
+                C.SetHidden_Vitality(HiddenStats[i * 3]);
+                C.SetHidden_Passion(HiddenStats[i * 3 + 1]);
+                C.SetHidden_Reason(HiddenStats[i * 3 + 2]);
+                GetNextSlot().AssignCharacter(C);
+            }
         }
     }
 }
