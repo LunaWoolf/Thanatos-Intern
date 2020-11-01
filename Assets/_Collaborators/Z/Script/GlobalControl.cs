@@ -68,7 +68,7 @@ namespace THAN
                 NewCharacter(NewCharacterIndex);
                 NewCharacterIndex++;
             }
-            //GenerateEvent();
+            GenerateEvent();
         }
 
         public void GenerateEvent()
