@@ -5,14 +5,15 @@ using UnityEngine;
 namespace THAN
 {
     public class EventChoice : MonoBehaviour {
+        [TextArea]
         public string Content;
 
-        public virtual void Effect(Bound B)
+        public virtual void Effect(Pair P)
         {
 
         }
 
-        public virtual bool Pass(Bound B)
+        public virtual bool Pass(Pair P)
         {
             return true;
         }

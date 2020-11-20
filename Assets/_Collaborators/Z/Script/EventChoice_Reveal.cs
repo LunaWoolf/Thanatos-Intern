@@ -6,10 +6,10 @@ namespace THAN
 {
     public class EventChoice_Reveal : EventChoice {
 
-        public override bool Pass(Bound B)
+        public override bool Pass(Pair P)
         {
-            Character I = B.S1.GetCharacter();
-            Character II = B.S2.GetCharacter();
+            Character I = P.GetCharacter(0);
+            Character II = P.GetCharacter(1);
 
             if (!I.GetHidden_Vitality() && !I.GetHidden_Passion() && !I.GetHidden_Reason()
                 && !II.GetHidden_Vitality() && !II.GetHidden_Passion() && !II.GetHidden_Reason())
@@ -17,10 +17,10 @@ namespace THAN
             return true;
         }
 
-        public override void Effect(Bound B)
+        public override void Effect(Pair P)
         {
-            Character I = B.S1.GetCharacter();
-            Character II = B.S2.GetCharacter();
+            Character I = P.GetCharacter(0);
+            Character II = P.GetCharacter(1);
 
             List<int> Hids = new List<int>();
             if (I.GetHidden_Vitality())

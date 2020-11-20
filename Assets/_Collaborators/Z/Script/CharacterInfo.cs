@@ -27,7 +27,7 @@ namespace THAN
 
         }
 
-        public void Import(CharacterInfo Info)
+        public void Import(CharacterInfo Info, Character Base)
         {
             Vitality = Info.Vitality;
             Passion = Info.Passion;

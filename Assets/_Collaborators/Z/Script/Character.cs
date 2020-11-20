@@ -7,15 +7,37 @@ namespace THAN
 {
     public class Character : MonoBehaviour {
         public CharacterInfo Info;
+        public string Name;
+        [Space]
+        public List<Event> CharacterEvents;
+        public Event RepeatEvent;
+        public int EventCoolRate;
+        public int EventCoolDown;
+        [Space]
+        public List<string> Barks;
+        public int CurrentBarkIndex;
+        public int BarkFailedTime;
         [Space]
         public TextMeshPro VitalityText;
         public TextMeshPro PassionText;
         public TextMeshPro ReasonText;
-        public Color Green;
-        public Color Red;
-        public Color Normal;
+        public GameObject VitalityLimit;
+        public GameObject PassionLimit;
+        public GameObject ReasonLimit;
+        public GameObject Outline;
         [Space]
         public Slot CurrentSlot;
+        public Vector2 OriPosition;
+        public Vector2 TargetPosition;
+        public AnimationCurve PositionCurve;
+        public float PositionDelay;
+        public float CurrentPositionTime;
+        public float OriZ;
+
+        public void Awake()
+        {
+            GlobalControl.Main.Characters.Add(this);
+        }
 
         // Start is called before the first frame update
         void Start()
@@ -27,71 +49,105 @@ namespace THAN
         void Update()
         {
             Render();
+            CurrentPositionTime -= Time.deltaTime;
+            PositionUpdate();
+        }
+
+        public void FixedUpdate()
+        {
+            PositionUpdate();
         }
 
         public void Render()
         {
+            Outline.SetActive(GlobalControl.Main.GetSelectingCharacter() == this);
             if (!GetHidden_Vitality())
             {
                 VitalityText.text = GetVitality() + "";
-                if (GetVitality() == 10)
-                    VitalityText.color = Normal;
-                else if (GetVitality() < 10)
-                    VitalityText.color = Green;
+                if (GetVitality() > GlobalControl.Main.GetVitalityLimit())
+                    VitalityLimit.SetActive(true);
                 else
-                    VitalityText.color = Red;
-                if (GetPersist_Vitality())
-                    VitalityText.text = "[" + VitalityText.text + "]";
+                    VitalityLimit.SetActive(false);
             }
             else
             {
-                VitalityText.text = "??";
-                VitalityText.color = Normal;
+                VitalityText.text = "?";
+                VitalityLimit.SetActive(false);
             }
 
             if (!GetHidden_Passion())
             {
                 PassionText.text = GetPassion() + "";
-                if (GetPassion() == 10)
-                    PassionText.color = Normal;
-                else if (GetPassion() < 10)
-                    PassionText.color = Green;
+                if (GetPassion() > GlobalControl.Main.GetPassionLimit())
+                    PassionLimit.SetActive(true);
                 else
-                    PassionText.color = Red;
-                if (GetPersist_Passion())
-                    PassionText.text = "[" + PassionText.text + "]";
+                    PassionLimit.SetActive(false);
             }
             else
             {
-                PassionText.text = "??";
-                PassionText.color = Normal;
+                PassionText.text = "?";
+                PassionLimit.SetActive(false);
             }
 
             if (!GetHidden_Reason())
             {
                 ReasonText.text = GetReason() + "";
-                if (GetReason() == 10)
-                    ReasonText.color = Normal;
-                else if (GetReason() < 10)
-                    ReasonText.color = Green;
+                if (GetReason() > GlobalControl.Main.GetReasonLimit())
+                    ReasonLimit.SetActive(true);
                 else
-                    ReasonText.color = Red;
-                if (GetPersist_Reason())
-                    ReasonText.text = "[" + ReasonText.text + "]";
+                    ReasonLimit.SetActive(false);
             }
             else
             {
-                ReasonText.text = "??";
-                ReasonText.color = Normal;
+                ReasonText.text = "?";
+                ReasonLimit.SetActive(false);
             }
         }
 
-        public void AssignSlot(Slot S)
+        public void TryBark()
         {
-            transform.parent = S.transform;
-            transform.localPosition = new Vector3();
+            if (BarkFailedTime >= 2 || Random.Range(0.01f, 0.99f) >= 0.5f)
+                Bark();
+            else
+                BarkFailedTime++;
+        }
 
-            CurrentSlot = S;
+        public void Bark()
+        {
+            BarkFailedTime = 0;
+            CurrentBarkIndex++;
+            if (CurrentBarkIndex >= Barks.Count)
+                CurrentBarkIndex = 0;
+        }
+
+        public string GetBark()
+        {
+            return Barks[CurrentBarkIndex];
+        }
+
+        public Event GetEvent()
+        {
+            if (!GetPair() || !GetPartner())
+                return null;
+            if (EventCoolDown > 0)
+                return null;
+            if (CharacterEvents.Count <= 0 && !RepeatEvent)
+                return null;
+            Event TE = null;
+            if (CharacterEvents.Count <= 0)
+                TE = RepeatEvent;
+            else
+                TE = CharacterEvents[0];
+            if (!TE.Pass(GetPair()))
+                return null;
+            return TE;
+        }
+
+        public void OnTriggerEvent(Event E)
+        {
+            EventCoolDown = EventCoolRate;
+            if (CharacterEvents.Contains(E))
+                CharacterEvents.Remove(E);
         }
 
         public void BoundValueChange(float V, float P, float R)
@@ -156,7 +212,8 @@ namespace THAN
 
         public bool CanDie()
         {
-            return GetVitality() <= 10 && GetPassion() <= 10 && GetReason() <= 10;
+            return GetVitality() <= GlobalControl.Main.GetVitalityLimit()
+                && GetPassion() <= GlobalControl.Main.GetPassionLimit() && GetReason() <= GlobalControl.Main.GetReasonLimit();
         }
 
         public void IniStat(float V, float P, float R)
@@ -166,7 +223,83 @@ namespace THAN
             SetReason(R);
         }
 
+        public Pair GetPair()
+        {
+            foreach (Pair P in GlobalControl.Main.Pairs)
+            {
+                if (this == P.GetCharacter(0) || this == P.GetCharacter(1))
+                    return P;
+            }
+            return null;
+        }
+
+        public Character GetPartner()
+        {
+            if (!GetPair())
+                return null;
+            Pair P = GetPair();
+            if (this == P.GetCharacter(0))
+                return P.GetCharacter(1);
+            else if (this == P.GetCharacter(1))
+                return P.GetCharacter(0);
+            return null;
+        }
+
+        public void AssignSlot(Slot S)
+        {
+            Vector2 a = S.GetPosition();
+            PositionChange(0.5f, new Vector2(a.x, a.y));
+            CurrentSlot = S;
+            TryBark();
+        }
+
+        public void PositionChange(float Delay, Vector2 Target)
+        {
+            OriPosition = transform.position;
+            TargetPosition = Target;
+            CurrentPositionTime = 0;
+            PositionDelay = Delay;
+        }
+
+        public void SetPosition(Vector2 Target)
+        {
+            OriPosition = Target;
+            TargetPosition = Target;
+            CurrentPositionTime = PositionDelay;
+        }
+
+        public void PositionUpdate()
+        {
+            if (GlobalControl.Main.HoldingCharacter == this)
+            {
+                Vector2 b = Cursor.Main.GetPosition();
+                transform.position = new Vector3(b.x, b.y, OriZ - 1);
+                return;
+            }
+
+            float v = 1 - (CurrentPositionTime / PositionDelay);
+            if (v > 1)
+                v = 1;
+            Vector2 a = OriPosition + (TargetPosition - OriPosition) * PositionCurve.Evaluate(v);
+            transform.position = new Vector3(a.x, a.y, OriZ);
+        }
+
+        public static Character Find(string Name)
+        {
+            for (int i = GlobalControl.Main.Characters.Count - 1; i >= 0; i--)
+            {
+                if (GlobalControl.Main.Characters[i].GetName() == Name)
+                    return GlobalControl.Main.Characters[i];
+            }
+            return null;
+        }
+
         //-------------------------------------------------------------------------------------------------------------
+
+        public string GetName()
+        {
+            return Name;
+        }
 
         public void ChangeVitality(float Value)
         {

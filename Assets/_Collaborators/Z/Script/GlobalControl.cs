@@ -9,13 +9,18 @@ namespace THAN
         public static GlobalControl Main;
         public int CurrentTime;
         [Space]
-        public List<Bound> Bounds;
-        public List<Slot> IndividualSlots;
-        public Slot DeathSlot;
+        public List<List<Slot>> Grid;
+        public List<Slot> Slots;
+        public Slot SelectingSlot;
+        public Character HoldingCharacter;
         [Space]
-        public List<EventChoice> Choices;
-        public List<int> ChoiceRates;
         public List<Event> Events;
+        public bool BoardActive;
+        public bool IndividualEventActive;
+        public bool TownEventActive;
+        [Space]
+        public EventRenderer IER;
+        public EventRenderer TER;
         [Space]
         public int DeathTime;
         public TextMeshPro DeathTimeText;
@@ -24,13 +29,24 @@ namespace THAN
         public int NewCharacterIndex = 6;
         public GameObject CharacterPrefab;
         public CharacterGenerator Generator;
-        
+        [Space]
+        public List<Character> Characters;
+        public List<Pair> Pairs;
+        [Space]
+        public int VitalityLimit = 10;
+        public int PassionLimit = 10;
+        public int ReasonLimit = 10;
+
+        public void Awake()
+        {
+            Grid = new List<List<Slot>>();
+        }
+
         // Start is called before the first frame update
         void Start()
         {
             for (int i = 1; i < 6; i++)
                 NewCharacter(i);
-            //StartCharacters();
         }
 
         // Update is called once per frame
@@ -41,18 +57,31 @@ namespace THAN
 
         public void EndOfTurn()
         {
-            foreach (Bound B in Bounds)
-            {
-                if (B.GetEvent())
-                    return;
-            }
+            StartCoroutine("EndOfTurnIE");
+        }
 
+        public IEnumerator EndOfTurnIE()
+        {
+            IndividualEventActive = false;
+            TownEventActive = false;
+            /*foreach (Bound B in Bounds)
+                B.Effect();*/
+            float a = 0;
+            yield return new WaitForSeconds(1.6f);
+            // TownEvent
+            yield return new WaitForSeconds(1.2f);
+            GenerateEvent();
+            while (a < 0.4f || IndividualEventActive)
+            {
+                a += Time.deltaTime;
+                yield return 0;
+            }
+            
             CurrentTime++;
             DeathTime--;
             NewCharacterTime--;
-            foreach (Bound B in Bounds)
-                B.Effect();
-            if (DeathSlot.GetCharacter())
+
+            /*if (DeathSlot.GetCharacter())
             {
                 Character C = DeathSlot.GetCharacter();
                 if (C.CanDie())
@@ -61,19 +90,33 @@ namespace THAN
                     DeathSlot.Empty();
                     DeathTime = 6;
                 }
-            }
-            if (NewCharacterTime <= 0)
+            }*/
+            /*if (NewCharacterTime <= 0)
             {
                 NewCharacterTime = 6;
                 NewCharacter(NewCharacterIndex);
                 NewCharacterIndex++;
-            }
-            GenerateEvent();
+            }*/
         }
 
         public void GenerateEvent()
         {
-            List<Bound> Bs = new List<Bound>();
+            List<Character> Cs = new List<Character>();
+            foreach (Character c in Characters)
+                if (c.GetEvent())
+                    Cs.Add(c);
+            if (Cs.Count <= 0)
+                return;
+            Character C = Cs[Random.Range(0, Cs.Count)];
+            Event E = C.GetEvent();
+            C.OnTriggerEvent(E);
+            IndividualEventActive = true;
+            IER.Activate(E, C.GetPair());
+        }
+
+        public void GenerateEvent_Legacy()
+        {
+            /*List<Bound> Bs = new List<Bound>();
             foreach (Bound Bo in Bounds)
             {
                 if (Bo.S1.GetCharacter() && Bo.S2.GetCharacter())
@@ -83,7 +126,15 @@ namespace THAN
                 return;
             Bound B = Bs[Random.Range(0, Bs.Count)];
 
-            B.E = Events[Random.Range(0, Events.Count)];
+            B.E = Events[Random.Range(0, Events.Count)];*/
+        }
+
+        public void ResolveEvent(int Index)
+        {
+            if (Index == 0)
+                TownEventActive = false;
+            else if (Index == 1)
+                IndividualEventActive = false;
         }
 
         public bool CanEndTurn()
@@ -116,10 +167,13 @@ namespace THAN
 
         public Slot GetNextSlot()
         {
-            for (int i = 0; i < IndividualSlots.Count; i++)
+            foreach (List<Slot> L in Grid)
             {
-                if (!IndividualSlots[i].GetCharacter())
-                    return IndividualSlots[i];
+                foreach (Slot S in L)
+                {
+                    if (!S.GetCharacter())
+                        return S;
+                }
             }
             return null;
         }
@@ -160,6 +214,43 @@ namespace THAN
                 C.SetHidden_Reason(HiddenStats[i * 3 + 2]);
                 GetNextSlot().AssignCharacter(C);
             }
+        }
+
+        public void AddSlot(Slot S)
+        {
+            Slots.Add(S);
+            for (int y = Grid.Count; y <= S.Position.y; y++)
+                Grid.Add(new List<Slot>());
+            for (int x = Grid[S.Position.y].Count; x <= S.Position.x; x++)
+                Grid[S.Position.y].Add(null);
+            Grid[S.Position.y][S.Position.x] = S;
+        }
+
+        public Character GetSelectingCharacter()
+        {
+            if (!SelectingSlot)
+                return null;
+            return SelectingSlot.GetCharacter();
+        }
+
+        public float GetVitalityLimit()
+        {
+            return VitalityLimit;
+        }
+
+        public float GetPassionLimit()
+        {
+            return PassionLimit;
+        }
+
+        public float GetReasonLimit()
+        {
+            return ReasonLimit;
+        }
+
+        public bool GetBoardActive()
+        {
+            return BoardActive;
         }
     }
 }

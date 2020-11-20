@@ -8,10 +8,6 @@ namespace THAN
     public class Bound : MonoBehaviour {
         public Slot S1;
         public Slot S2;
-        [Space]
-        public Event E;
-        public GameObject EventBase;
-        public TextMeshPro TitleText;
 
         // Start is called before the first frame update
         void Start()
@@ -27,16 +23,7 @@ namespace THAN
 
         public void Render()
         {
-            if (!GetEvent())
-            {
-                TitleText.text = "";
-                EventBase.SetActive(false);
-            }
-            else
-            {
-                TitleText.text = GetEvent().GetTitle();
-                EventBase.SetActive(true);
-            }
+
         }
 
         public void Effect()
@@ -53,16 +40,6 @@ namespace THAN
             float R2 = C2.GetReason();
             C1.BoundValueChange(V2, P2, R2);
             C2.BoundValueChange(V1, P1, R1);
-        }
-
-        public void EmptyEvent()
-        {
-            E = null;
-        }
-
-        public Event GetEvent()
-        {
-            return E;
         }
     }
 }

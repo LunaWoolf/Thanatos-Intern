@@ -5,9 +5,15 @@ using UnityEngine;
 namespace THAN
 {
     public class Slot : MonoBehaviour {
-        public Bound B;
-        public GameObject AnimBase;
+        public bool IniActive;
+        public Vector2Int Position;
         public Character CurrentCharacter;
+
+        public void Awake()
+        {
+            if (IniActive)
+                GlobalControl.Main.AddSlot(this);
+        }
 
         // Start is called before the first frame update
         void Start()
@@ -25,13 +31,11 @@ namespace THAN
         {
             CurrentCharacter = C;
             C.AssignSlot(this);
-            AnimBase.SetActive(false);
         }
 
         public void Empty()
         {
             CurrentCharacter = null;
-            AnimBase.SetActive(true);
         }
 
         public Character GetCharacter()
@@ -39,11 +43,20 @@ namespace THAN
             return CurrentCharacter;
         }
 
-        public void OnMouseDown()
+        public Vector2 GetPosition()
         {
-            if (B && B.GetEvent())
-                return;
-            GlobalControl.Main.SlotExchange(this, Cursor.GetCursorSlot());
+            return transform.position;
+        }
+
+        public void OnMouseEnter()
+        {
+            GlobalControl.Main.SelectingSlot = this;
+        }
+
+        public void OnMouseExit()
+        {
+            if (GlobalControl.Main.SelectingSlot == this)
+                GlobalControl.Main.SelectingSlot = null;
         }
     }
 }

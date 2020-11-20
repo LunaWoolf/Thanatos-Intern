@@ -8,10 +8,10 @@ namespace THAN
         public Vector3Int ChangeA;
         public Vector3Int ChangeB;
 
-        public override bool Pass(Bound B)
+        public override bool Pass(Pair P)
         {
-            Character I = B.S1.GetCharacter();
-            Character II = B.S2.GetCharacter();
+            Character I = P.GetCharacter(0);
+            Character II = P.GetCharacter(1);
 
             if (ChangeA.x != 0 && I.GetHidden_Vitality())
                 return false;
@@ -28,10 +28,10 @@ namespace THAN
             return true;
         }
 
-        public override void Effect(Bound B)
+        public override void Effect(Pair P)
         {
-            Character I = B.S1.GetCharacter();
-            Character II = B.S2.GetCharacter();
+            Character I = P.GetCharacter(0);
+            Character II = P.GetCharacter(1);
 
             I.ChangeVitality(ChangeA.x);
             I.ChangePassion(ChangeA.y);

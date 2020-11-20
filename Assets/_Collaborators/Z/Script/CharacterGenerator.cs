@@ -77,46 +77,51 @@ namespace THAN
                     }
                 }
             }
-            else if (Seed == 1)
+            else if (Seed == 1) //败家子
             {
                 C.IniStat(22, 6, 6);
             }
-            else if (Seed == 2)
+            else if (Seed == 2) //女巫
             {
                 C.IniStat(7, 13, 2);
             }
-            else if (Seed == 3)
+            else if (Seed == 3) //邪恶小女孩
             {
-                C.IniStat(2, 4, 20);
-                C.SetHidden_Vitality(true);
+                C.IniStat(8, 4, 20);
             }
-            else if (Seed == 4)
+            else if (Seed == 4) //贵族
             {
                 C.IniStat(5, 19, 8);
-            }
-            else if (Seed == 5)
-            {
-                C.IniStat(8, 8, 7);
-            }
-            else if (Seed == 6)
-            {
-                C.IniStat(14, 15, 12);
-                C.SetHidden_Vitality(true);
-            }
-            else if (Seed == 7)
-            {
-                C.IniStat(8, 5, 2);
-            }
-            else if (Seed == 8)
-            {
-                C.IniStat(1, 8, 24);
                 C.SetHidden_Reason(true);
             }
-            else if (Seed == 9)
+            else if (Seed == 5) //夫人
+            {
+                C.IniStat(2, 8, 7);
+                C.SetHidden_Reason(true);
+            }
+            else if (Seed == 5) //工具人
+            {
+                C.IniStat(12, 10, 6);
+                C.SetHidden_Vitality(true);
+            }
+            else if (Seed == 6) //小男孩
+            {
+                C.IniStat(8, 2, 4);
+            }
+            else if (Seed == 6) //小女孩
+            {
+                C.IniStat(12, 18, 16);
+            }
+            else if (Seed == 7) //神秘人
             {
                 C.IniStat(14, 3, 13);
                 C.SetHidden_Vitality(true);
                 C.SetHidden_Passion(true);
+                C.SetHidden_Reason(true);
+            }
+            else if (Seed == 8) //那个人
+            {
+                C.IniStat(1, 8, 24);
                 C.SetHidden_Reason(true);
             }
             else if (Seed == 10)

@@ -6,6 +6,9 @@ namespace THAN
 {
     public class Event : MonoBehaviour {
         public string Title;
+        public string Source;
+        [TextArea]
+        public string Content;
         public List<EventChoice> Choices;
 
         // Start is called before the first frame update
@@ -18,6 +21,11 @@ namespace THAN
         void Update()
         {
 
+        }
+        
+        public virtual bool Pass(Pair P)
+        {
+            return true;
         }
 
         public List<EventChoice> GetChoices()
@@ -35,6 +43,16 @@ namespace THAN
         public string GetTitle()
         {
             return Title;
+        }
+
+        public Character GetSource()
+        {
+            return Character.Find(Source);
+        }
+
+        public string GetContent()
+        {
+            return Content;
         }
     }
 }
