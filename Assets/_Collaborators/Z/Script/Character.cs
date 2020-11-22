@@ -6,6 +6,7 @@ using TMPro;
 namespace THAN
 {
     public class Character : MonoBehaviour {
+        public Animator Anim;
         public CharacterInfo Info;
         public string Name;
         [Space]
@@ -27,6 +28,7 @@ namespace THAN
         public GameObject Outline;
         [Space]
         public Slot CurrentSlot;
+        public Pair CurrentPair;
         public Vector2 OriPosition;
         public Vector2 TargetPosition;
         public AnimationCurve PositionCurve;
@@ -60,7 +62,7 @@ namespace THAN
 
         public void Render()
         {
-            Outline.SetActive(GlobalControl.Main.GetSelectingCharacter() == this);
+            Outline.SetActive(GlobalControl.Main.GetSelectingCharacter() == this || GlobalControl.Main.HoldingCharacter == this);
             if (!GetHidden_Vitality())
             {
                 VitalityText.text = GetVitality() + "";
@@ -133,7 +135,7 @@ namespace THAN
                 return null;
             if (CharacterEvents.Count <= 0 && !RepeatEvent)
                 return null;
-            Event TE = null;
+            Event TE;
             if (CharacterEvents.Count <= 0)
                 TE = RepeatEvent;
             else
@@ -154,17 +156,11 @@ namespace THAN
         {
             if (V > GetVitality() + 1)
             {
-                if (GetPersist_Vitality())
-                    ChangeVitality(Random.Range(0, 2));
-                else
-                    ChangeVitality(1);
+                ChangeVitality(1);
             }
             else if (V < GetVitality() - 1)
             {
-                if (GetPersist_Vitality())
-                    ChangeVitality(Random.Range(0, -2));
-                else
-                    ChangeVitality(-1);
+                ChangeVitality(-1);
             }
             else if (GetHidden_Vitality())
             {
@@ -173,17 +169,11 @@ namespace THAN
 
             if (P > GetPassion() + 1)
             {
-                if (GetPersist_Passion())
-                    ChangePassion(Random.Range(0, 2));
-                else
-                    ChangePassion(1);
+                ChangePassion(1);
             }
             else if (P < GetPassion() - 1)
             {
-                if (GetPersist_Passion())
-                    ChangePassion(Random.Range(0, -2));
-                else
-                    ChangePassion(-1);
+                ChangePassion(-1);
             }
             else if (GetHidden_Passion())
             {
@@ -192,17 +182,11 @@ namespace THAN
 
             if (R > GetReason() + 1)
             {
-                if (GetPersist_Reason())
-                    ChangeReason(Random.Range(0, 2));
-                else
-                    ChangeReason(1);
+                ChangeReason(1);
             }
             else if (R < GetReason() - 1)
             {
-                if (GetPersist_Reason())
-                    ChangeReason(Random.Range(0, -2));
-                else
-                    ChangeReason(-1);
+                ChangeReason(-1);
             }
             else if (GetHidden_Reason())
             {
@@ -245,43 +229,103 @@ namespace THAN
             return null;
         }
 
+        public void CreatePair(Character C)
+        {
+            Slot Ori = null;
+            Slot Target = CurrentSlot.GetPairSlot();
+            while (!Target)
+            {
+                Ori = GlobalControl.Main.GetNextSlot(Ori);
+                Target = Ori.GetPairSlot();
+            }
+            if (Ori && Ori != CurrentSlot)
+                ChangeSlot(Ori);
+            if (Target.GetCharacter())
+                Target.GetCharacter().ChangeSlot(GlobalControl.Main.GetNextSlot(Target));
+            C.PutDown(Target);
+
+            GameObject G = Instantiate(GlobalControl.Main.PairPrefab);
+            Pair P = G.GetComponent<Pair>();
+            P.Ini(this, C);
+            P.SetPosition((CurrentSlot.GetPosition() + C.CurrentSlot.GetPosition()) * 0.5f);
+            GlobalControl.Main.AddPair(P);
+        }
+
+        public bool CanPair()
+        {
+            return !GetPair();
+        }
+
+        public void ChangeSlot(Slot S)
+        {
+            if (CurrentSlot)
+                CurrentSlot.Empty();
+            S.AssignCharacter(this);
+        }
+
         public void AssignSlot(Slot S)
         {
-            Vector2 a = S.GetPosition();
-            PositionChange(0.5f, new Vector2(a.x, a.y));
+            PositionChange(S.GetPosition());
             CurrentSlot = S;
             TryBark();
         }
 
-        public void PositionChange(float Delay, Vector2 Target)
+        public void PickUp()
+        {
+            if (GetPair())
+                GlobalControl.Main.RemovePair(GetPair());
+            if (CurrentSlot)
+                CurrentSlot.Empty();
+            CurrentSlot = null;
+            PositionChange(Cursor.Main.GetPosition());
+            GlobalControl.Main.HoldingCharacter = this;
+        }
+
+        public void PutDown(Slot S)
+        {
+            GlobalControl.Main.HoldingCharacter = null;
+            S.AssignCharacter(this);
+        }
+
+        public void PositionChange(Vector2 Target)
         {
             OriPosition = transform.position;
             TargetPosition = Target;
-            CurrentPositionTime = 0;
-            PositionDelay = Delay;
+            PositionDelay = 0.15f;
+            CurrentPositionTime = PositionDelay;
         }
 
         public void SetPosition(Vector2 Target)
         {
             OriPosition = Target;
             TargetPosition = Target;
-            CurrentPositionTime = PositionDelay;
+            CurrentPositionTime = 0f;
         }
 
         public void PositionUpdate()
         {
             if (GlobalControl.Main.HoldingCharacter == this)
             {
-                Vector2 b = Cursor.Main.GetPosition();
-                transform.position = new Vector3(b.x, b.y, OriZ - 1);
-                return;
+                if (CurrentPositionTime <= 0)
+                {
+                    Vector2 b = Cursor.Main.GetPosition();
+                    transform.position = new Vector3(b.x, b.y, OriZ - 1);
+                    return;
+                }
+                else
+                {
+                    TargetPosition = Cursor.Main.GetPosition();
+                }
             }
 
             float v = 1 - (CurrentPositionTime / PositionDelay);
             if (v > 1)
                 v = 1;
             Vector2 a = OriPosition + (TargetPosition - OriPosition) * PositionCurve.Evaluate(v);
-            transform.position = new Vector3(a.x, a.y, OriZ);
+            if (GlobalControl.Main.HoldingCharacter != this)
+                transform.position = new Vector3(a.x, a.y, OriZ);
+            else
+                transform.position = new Vector3(a.x, a.y, OriZ - 1);
         }
 
         public static Character Find(string Name)
@@ -306,6 +350,8 @@ namespace THAN
             float a = Info.Vitality + Value;
             if (a < 1)
                 a = 1;
+            if (a != GetVitality())
+                Anim.SetTrigger("VitalityChange");
             SetVitality(a);
         }
 
@@ -319,6 +365,8 @@ namespace THAN
             float a = Info.Passion + Value;
             if (a < 1)
                 a = 1;
+            if (a != GetPassion())
+                Anim.SetTrigger("PassionChange");
             SetPassion(a);
         }
 
@@ -332,6 +380,8 @@ namespace THAN
             float a = Info.Reason + Value;
             if (a < 1)
                 a = 1;
+            if (a != GetReason())
+                Anim.SetTrigger("ReasonChange");
             SetReason(a);
         }
 
@@ -342,32 +392,23 @@ namespace THAN
 
         public void SetHidden_Vitality(bool Value)
         {
+            if (Value != GetHidden_Vitality())
+                Anim.SetTrigger("VitalityChange");
             Info.SetHidden_Vitality(Value);
         }
 
         public void SetHidden_Passion(bool Value)
         {
+            if (Value != GetHidden_Passion())
+                Anim.SetTrigger("PassionChange");
             Info.SetHidden_Passion(Value);
         }
 
         public void SetHidden_Reason(bool Value)
         {
+            if (Value != GetHidden_Reason())
+                Anim.SetTrigger("ReasonChange");
             Info.SetHidden_Reason(Value);
-        }
-
-        public void SetPersist_Vitality(bool Value)
-        {
-            Info.SetPersist_Vitality(Value);
-        }
-
-        public void SetPersist_Passion(bool Value)
-        {
-            Info.SetPersist_Passion(Value);
-        }
-
-        public void SetPersist_Reason(bool Value)
-        {
-            Info.SetPersist_Reason(Value);
         }
 
         public float GetVitality()
@@ -398,21 +439,6 @@ namespace THAN
         public bool GetHidden_Reason()
         {
             return Info.Hidden_Reason;
-        }
-
-        public bool GetPersist_Vitality()
-        {
-            return Info.Persist_Vitality;
-        }
-
-        public bool GetPersist_Passion()
-        {
-            return Info.Persist_Passion;
-        }
-
-        public bool GetPersist_Reason()
-        {
-            return Info.Persist_Reason;
         }
     }
 }

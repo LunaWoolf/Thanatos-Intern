@@ -28,8 +28,10 @@ namespace THAN
             return true;
         }
 
-        public override void Effect(Pair P)
+        public override void Effect(Pair P, out Event AddEvent)
         {
+            AddEvent = null;
+
             Character I = P.GetCharacter(0);
             Character II = P.GetCharacter(1);
 

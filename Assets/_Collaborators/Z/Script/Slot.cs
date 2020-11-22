@@ -43,6 +43,21 @@ namespace THAN
             return CurrentCharacter;
         }
 
+        public Slot GetPairSlot()
+        {
+            if (GlobalControl.Main.GetSlot(Position.x + 1, Position.y) && !GlobalControl.Main.GetSlot(Position.x + 1, Position.y).GetCharacter())
+                return GlobalControl.Main.GetSlot(Position.x + 1, Position.y);
+            else if (GlobalControl.Main.GetSlot(Position.x - 1, Position.y) && !GlobalControl.Main.GetSlot(Position.x - 1, Position.y).GetCharacter())
+                return GlobalControl.Main.GetSlot(Position.x - 1, Position.y);
+            else if (GlobalControl.Main.GetSlot(Position.x + 1, Position.y) && GlobalControl.Main.GetSlot(Position.x + 1, Position.y).GetCharacter()
+                && !GlobalControl.Main.GetSlot(Position.x + 1, Position.y).GetCharacter().GetPair())
+                return GlobalControl.Main.GetSlot(Position.x + 1, Position.y);
+            else if (GlobalControl.Main.GetSlot(Position.x - 1, Position.y) && GlobalControl.Main.GetSlot(Position.x - 1, Position.y).GetCharacter()
+                && !GlobalControl.Main.GetSlot(Position.x - 1, Position.y).GetCharacter().GetPair())
+                return GlobalControl.Main.GetSlot(Position.x - 1, Position.y);
+            return null;
+        }
+
         public Vector2 GetPosition()
         {
             return transform.position;
@@ -50,7 +65,8 @@ namespace THAN
 
         public void OnMouseEnter()
         {
-            GlobalControl.Main.SelectingSlot = this;
+            if (GlobalControl.Main.GetBoardActive())
+                GlobalControl.Main.SelectingSlot = this;
         }
 
         public void OnMouseExit()

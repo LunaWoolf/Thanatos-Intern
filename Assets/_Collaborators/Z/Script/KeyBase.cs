@@ -5,6 +5,7 @@ using UnityEngine;
 namespace THAN
 {
     public class KeyBase : MonoBehaviour {
+        public static KeyBase Main;
         public List<string> Keys;
 
         public void Ini()

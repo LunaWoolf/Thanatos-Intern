@@ -52,6 +52,8 @@ namespace THAN
 
         public void Disable()
         {
+            if (!Active)
+                return;
             Anim.SetBool("Active", false);
             C2D.enabled = false;
             OnMouseExit();

@@ -11,9 +11,6 @@ namespace THAN
         public bool Hidden_Vitality;
         public bool Hidden_Passion;
         public bool Hidden_Reason;
-        public bool Persist_Vitality;
-        public bool Persist_Passion;
-        public bool Persist_Reason;
 
         // Start is called before the first frame update
         void Start()
@@ -35,9 +32,6 @@ namespace THAN
             Hidden_Vitality = Info.Hidden_Vitality;
             Hidden_Passion = Info.Hidden_Passion;
             Hidden_Reason = Info.Hidden_Reason;
-            Persist_Vitality = Info.Persist_Vitality;
-            Persist_Passion = Info.Persist_Passion;
-            Persist_Reason = Info.Persist_Reason;
         }
 
         public void SetVitality(float Value)
@@ -68,21 +62,6 @@ namespace THAN
         public void SetHidden_Reason(bool Value)
         {
             Hidden_Reason = Value;
-        }
-
-        public void SetPersist_Vitality(bool Value)
-        {
-            Persist_Vitality = Value;
-        }
-
-        public void SetPersist_Passion(bool Value)
-        {
-            Persist_Passion = Value;
-        }
-
-        public void SetPersist_Reason(bool Value)
-        {
-            Persist_Reason = Value;
         }
     }
 }

@@ -8,9 +8,9 @@ namespace THAN
         [TextArea]
         public string Content;
 
-        public virtual void Effect(Pair P)
+        public virtual void Effect(Pair P, out Event AddEvent)
         {
-
+            AddEvent = null;
         }
 
         public virtual bool Pass(Pair P)

@@ -14,7 +14,7 @@ namespace THAN
         public Slot SelectingSlot;
         public Character HoldingCharacter;
         [Space]
-        public List<Event> Events;
+        public List<TownEvent> TownEvents;
         public bool BoardActive;
         public bool IndividualEventActive;
         public bool TownEventActive;
@@ -22,16 +22,12 @@ namespace THAN
         public EventRenderer IER;
         public EventRenderer TER;
         [Space]
-        public int DeathTime;
-        public TextMeshPro DeathTimeText;
-        [Space]
-        public int NewCharacterTime;
-        public int NewCharacterIndex = 6;
-        public GameObject CharacterPrefab;
-        public CharacterGenerator Generator;
+        public List<Character> StartCharacters;
         [Space]
         public List<Character> Characters;
         public List<Pair> Pairs;
+        [Space]
+        public GameObject PairPrefab;
         [Space]
         public int VitalityLimit = 10;
         public int PassionLimit = 10;
@@ -42,91 +38,96 @@ namespace THAN
             Grid = new List<List<Slot>>();
         }
 
+        public void StartCharacterIni()
+        {
+            foreach (Character C in StartCharacters)
+                GetNextSlot().AssignCharacter(C);
+        }
+
         // Start is called before the first frame update
         void Start()
         {
-            for (int i = 1; i < 6; i++)
-                NewCharacter(i);
+            StartCharacterIni();
         }
 
         // Update is called once per frame
         void Update()
         {
-            DeathTimeText.text = "- " + DeathTime + " -";
+            if (Input.GetKeyDown(KeyCode.Space) && CanEndTurn())
+                EndOfTurn();
         }
 
         public void EndOfTurn()
         {
+            SelectingSlot = null;
             StartCoroutine("EndOfTurnIE");
         }
 
         public IEnumerator EndOfTurnIE()
         {
+            BoardActive = false;
             IndividualEventActive = false;
             TownEventActive = false;
-            /*foreach (Bound B in Bounds)
-                B.Effect();*/
+            foreach (Pair P in Pairs)
+                P.Effect();
             float a = 0;
-            yield return new WaitForSeconds(1.6f);
-            // TownEvent
+
             yield return new WaitForSeconds(1.2f);
-            GenerateEvent();
+
+            yield return GenerateTownEvent();
+            while (a < 0.4f || TownEventActive)
+            {
+                a += Time.deltaTime;
+                yield return 0;
+            }
+
+            yield return new WaitForSeconds(1.2f);
+
+            yield return GenerateEvent();
             while (a < 0.4f || IndividualEventActive)
             {
                 a += Time.deltaTime;
                 yield return 0;
             }
-            
-            CurrentTime++;
-            DeathTime--;
-            NewCharacterTime--;
 
-            /*if (DeathSlot.GetCharacter())
-            {
-                Character C = DeathSlot.GetCharacter();
-                if (C.CanDie())
-                {
-                    Destroy(C.gameObject);
-                    DeathSlot.Empty();
-                    DeathTime = 6;
-                }
-            }*/
-            /*if (NewCharacterTime <= 0)
-            {
-                NewCharacterTime = 6;
-                NewCharacter(NewCharacterIndex);
-                NewCharacterIndex++;
-            }*/
+            yield return new WaitForSeconds(1.6f);
+
+            CurrentTime++;
+            BoardActive = true;
         }
 
-        public void GenerateEvent()
+        public bool CanEndTurn()
+        {
+            return GetBoardActive() && !HoldingCharacter;
+        }
+
+        public IEnumerator GenerateTownEvent()
+        {
+            Event E = null;
+            foreach (TownEvent TE in TownEvents)
+            {
+                if (TE.CanTrigger())
+                    E = TE;
+            }
+            if (!E)
+                yield break;
+            TownEventActive = true;
+            TER.Activate(E, null);
+        }
+
+        public IEnumerator GenerateEvent()
         {
             List<Character> Cs = new List<Character>();
             foreach (Character c in Characters)
                 if (c.GetEvent())
                     Cs.Add(c);
             if (Cs.Count <= 0)
-                return;
+                yield break;
             Character C = Cs[Random.Range(0, Cs.Count)];
             Event E = C.GetEvent();
             C.OnTriggerEvent(E);
             IndividualEventActive = true;
             IER.Activate(E, C.GetPair());
-        }
-
-        public void GenerateEvent_Legacy()
-        {
-            /*List<Bound> Bs = new List<Bound>();
-            foreach (Bound Bo in Bounds)
-            {
-                if (Bo.S1.GetCharacter() && Bo.S2.GetCharacter())
-                    Bs.Add(Bo);
-            }
-            if (Bs.Count <= 0)
-                return;
-            Bound B = Bs[Random.Range(0, Bs.Count)];
-
-            B.E = Events[Random.Range(0, Events.Count)];*/
         }
 
         public void ResolveEvent(int Index)
@@ -137,9 +138,20 @@ namespace THAN
                 IndividualEventActive = false;
         }
 
-        public bool CanEndTurn()
+        public void AddPair(Pair P)
         {
-            return true;
+            P.C1.CurrentPair = P;
+            P.C2.CurrentPair = P;
+            Pairs.Add(P);
+        }
+
+        public void RemovePair(Pair P)
+        {
+            P.C1.CurrentPair = null;
+            P.C2.CurrentPair = null;
+            Pairs.Remove(P);
+            P.gameObject.SetActive(false);
+            Destroy(P.gameObject, 3f);
         }
 
         public void SlotExchange(Slot A, Slot B)
@@ -178,42 +190,31 @@ namespace THAN
             return null;
         }
 
-        public void NewCharacter(int Seed)
+        public Slot GetNextSlot(Slot Ori)
         {
-            if (Seed > 10)
-                return;
-            if (!GetNextSlot())
-                return;
-            GameObject G = Instantiate(CharacterPrefab);
-            Character C = G.GetComponent<Character>();
-            Generator.GenerateValue(C, Seed);
-            GetNextSlot().AssignCharacter(C);
+            if (!Ori)
+                GetNextSlot();
+            bool a = false;
+            foreach (List<Slot> L in Grid)
+            {
+                foreach (Slot S in L)
+                {
+                    if (S == Ori)
+                        a = true;
+                    if (a && !S.GetCharacter())
+                        return S;
+                }
+            }
+            return GetNextSlot();
         }
 
-        public void StartCharacters()
+        public Slot GetSlot(int x, int y)
         {
-            List<int> Stats = Generator.GenerateStartStats();
-
-            List<bool> HiddenStats = new List<bool>();
-            for (int asd = 0; asd < 15; asd++)
-                HiddenStats.Add(false);
-            int a = Random.Range(0, HiddenStats.Count);
-            int b = a;
-            while (b == a)
-                b = Random.Range(0, HiddenStats.Count);
-            HiddenStats[a] = false;
-            HiddenStats[b] = false;
-
-            for (int i = 0; i < 5; i++)
-            {
-                GameObject G = Instantiate(CharacterPrefab);
-                Character C = G.GetComponent<Character>();
-                C.IniStat(Stats[i * 3], Stats[i * 3] + 1, Stats[i * 3 + 2]);
-                C.SetHidden_Vitality(HiddenStats[i * 3]);
-                C.SetHidden_Passion(HiddenStats[i * 3 + 1]);
-                C.SetHidden_Reason(HiddenStats[i * 3 + 2]);
-                GetNextSlot().AssignCharacter(C);
-            }
+            if (y >= Grid.Count)
+                return null;
+            if (x >= Grid[y].Count)
+                return null;
+            return Grid[y][x];
         }
 
         public void AddSlot(Slot S)

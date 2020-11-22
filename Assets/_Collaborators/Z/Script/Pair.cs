@@ -20,6 +20,12 @@ namespace THAN
 
         }
 
+        public void Ini(Character I, Character II)
+        {
+            C1 = I;
+            C2 = II;
+        }
+
         public Character GetCharacter(int Index)
         {
             if (Index == 0)
@@ -27,6 +33,25 @@ namespace THAN
             else if (Index == 1)
                 return C2;
             return null;
+        }
+
+        public void SetPosition(Vector2 Target)
+        {
+            transform.position = new Vector3(Target.x, Target.y, transform.position.z);
+        }
+
+        public void Effect()
+        {
+            if (!C1 || !C2)
+                return;
+            float V1 = C1.GetVitality();
+            float P1 = C1.GetPassion();
+            float R1 = C1.GetReason();
+            float V2 = C2.GetVitality();
+            float P2 = C2.GetPassion();
+            float R2 = C2.GetReason();
+            C1.BoundValueChange(V2, P2, R2);
+            C2.BoundValueChange(V1, P1, R1);
         }
     }
 }
