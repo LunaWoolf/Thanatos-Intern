@@ -7,7 +7,7 @@ namespace THAN
     public class EventChoice_Fish : EventChoice {
         public List<Event> AddEvents;
 
-        public override void Effect(Pair P, out Event AddEvent)
+        public override void Effect(List<Character> Characters, out Event AddEvent)
         {
             if (KeyBase.Main.GetKey("FishIndex") < AddEvents.Count)
             {

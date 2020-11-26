@@ -7,6 +7,7 @@ namespace THAN
     public class Pair : MonoBehaviour {
         public Character C1;
         public Character C2;
+        public GameObject Mask;
 
         // Start is called before the first frame update
         void Start()
@@ -52,6 +53,17 @@ namespace THAN
             float R2 = C2.GetReason();
             C1.BoundValueChange(V2, P2, R2);
             C2.BoundValueChange(V1, P1, R1);
+        }
+
+        public void ActivateMask()
+        {
+            Mask.SetActive(true);
+            GlobalControl.Main.MaskedPairs.Add(this);
+        }
+
+        public void DisableMask()
+        {
+            Mask.SetActive(false);
         }
     }
 }

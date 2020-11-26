@@ -7,6 +7,9 @@ namespace THAN
     public class Event : MonoBehaviour {
         public string Title;
         public string Source;
+        public List<string> FreeSources;
+        [Space]
+        public string RequiredKey;
         [TextArea]
         public string Content;
         public bool DisplaySource;
@@ -26,6 +29,15 @@ namespace THAN
         
         public virtual bool Pass(Pair P)
         {
+            if (!P && FreeSources.Count <= 0)
+                return false;
+            foreach (string s in FreeSources)
+                if (!Character.Find(s) || !Character.Find(s).Active)
+                    return false;
+            if (Source != "" && !Character.Find(Source))
+                return false;
+            if (RequiredKey != "" && KeyBase.Main.GetKey(RequiredKey) <= 0)
+                return false;
             return true;
         }
 

@@ -478,6 +478,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 8771607942534179553}
+  - {fileID: 7782320813960011712}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -497,12 +498,12 @@ MonoBehaviour:
   Info: {fileID: 1907539348224468110}
   Name: 
   CharacterEvents: []
+  FreeEvents: []
   RepeatEvent: {fileID: 0}
-  EventCoolRate: 1
+  EventCoolRate: 2
   EventCoolDown: 0
-  Barks: []
-  CurrentBarkIndex: 0
-  BarkFailedTime: 0
+  StartTime: -1
+  Active: 0
   VitalityText: {fileID: 3207418463383677010}
   PassionText: {fileID: 3207418463375492861}
   ReasonText: {fileID: 3207418462974425254}
@@ -510,6 +511,7 @@ MonoBehaviour:
   PassionLimit: {fileID: 1858274265818773498}
   ReasonLimit: {fileID: 348957905934558164}
   Outline: {fileID: 2435296808903291813}
+  Mask: {fileID: 5085409362132224902}
   CurrentSlot: {fileID: 0}
   CurrentPair: {fileID: 0}
   OriPosition: {x: 999, y: 999}
@@ -538,7 +540,33 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  PositionDelay: 0.5
+  PositionDelay: 0.15
+  Highlighted: 0
+  HighlightedCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 2.8351648
+      outSlope: 2.8351648
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.020833334
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  HighlightedDelay: 0.4
   CurrentPositionTime: 0
   OriZ: 0
 --- !u!114 &1907539348224468110
@@ -1199,6 +1227,87 @@ Transform:
   m_Father: {fileID: 8771607942534179553}
   m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &5085409362132224902
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7782320813960011712}
+  - component: {fileID: 1880140629960072383}
+  m_Layer: 0
+  m_Name: Mask
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &7782320813960011712
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5085409362132224902}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 4.20444, y: 4.45, z: 0.8969472}
+  m_Children: []
+  m_Father: {fileID: 3207418462324221637}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!331 &1880140629960072383
+SpriteMask:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5085409362132224902}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 10758, guid: 0000000000000000f000000000000000, type: 0}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_Sprite: {fileID: 21300000, guid: dfb48db552166b74da2e3321be4df098, type: 3}
+  m_MaskAlphaCutoff: 0.2
+  m_FrontSortingLayerID: 2112454381
+  m_BackSortingLayerID: 2112454381
+  m_FrontSortingLayer: 1
+  m_BackSortingLayer: 1
+  m_FrontSortingOrder: 2
+  m_BackSortingOrder: -1
+  m_IsCustomRangeActive: 1
+  m_SpriteSortPoint: 0
 --- !u!1 &5142570313193347545
 GameObject:
   m_ObjectHideFlags: 0

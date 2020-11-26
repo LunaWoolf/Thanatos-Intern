@@ -18,6 +18,7 @@ namespace THAN
         public ChoiceRenderer CRI;
         public ChoiceRenderer CRII;
         public ChoiceRenderer CRIII;
+        public List<float> AttachPositions;
         [Space]
         public Event CurrentEvent;
         public Event CurrentAddEvent;
@@ -77,18 +78,52 @@ namespace THAN
             Effect(Index);
         }
 
-        public void Effect(int Index)
+        public void Effect(int index)
         {
-            if (Index == 2)
+            List<Character> t = new List<Character>();
+            if (index == 2)
             {
-                GetAddEvent().GetChoices()[Index - 2].Effect(GetSourcePair(), out Event AddEvent);
+                if (GetAddEvent().FreeSources.Count == 0)
+                {
+                    if (GetSourcePair())
+                    {
+                        t.Add(GetSourcePair().GetCharacter(0));
+                        t.Add(GetSourcePair().GetCharacter(1));
+                    }
+                }
+                else
+                {
+                    foreach (string s in GetAddEvent().FreeSources)
+                        t.Add(Character.Find(s));
+                }
+                GetAddEvent().GetChoices()[index - 2].Effect(t, out Event _);
+                GlobalControl.Main.ResolveEvent(Index);
                 Disable();
             }
             else
             {
-                GetEvent().GetChoices()[Index].Effect(GetSourcePair(), out Event AddEvent);
+                if (GetEvent().FreeSources.Count == 0)
+                {
+                    if (GetSourcePair())
+                    {
+                        t.Add(GetSourcePair().GetCharacter(0));
+                        t.Add(GetSourcePair().GetCharacter(1));
+                    }
+                }
+                else
+                {
+                    foreach (string s in GetEvent().FreeSources)
+                        t.Add(Character.Find(s));
+                }
+                EventChoice EC = GetEvent().GetChoices()[index];
+                EC.Effect(t, out Event AddEvent);
+                if (EC.TriggerSequence && Character.Find(GetEvent().Source))
+                    Character.Find(GetEvent().Source).AdvanceSequence(GetEvent());
                 if (!AddEvent)
+                {
+                    GlobalControl.Main.ResolveEvent(Index);
                     Disable();
+                }
                 else
                     AddActivate(AddEvent);
             }

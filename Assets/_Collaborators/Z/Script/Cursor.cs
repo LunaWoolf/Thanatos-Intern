@@ -47,7 +47,7 @@ namespace THAN
             }
             else
             {
-                if (GlobalControl.Main.GetSelectingCharacter())
+                if (GlobalControl.Main.GetSelectingCharacter() && GlobalControl.Main.GetSelectingCharacter().CurrentSlot != GlobalControl.Main.SacrificeSlot)
                 {
                     if (GlobalControl.Main.GetSelectingCharacter().CanPair())
                     {
@@ -57,7 +57,7 @@ namespace THAN
                 else
                 {
                     Slot S = GetSelectingSlot();
-                    if (!S.GetCharacter())
+                    if (!S.GetCharacter() && (S != GlobalControl.Main.SacrificeSlot || GlobalControl.Main.HoldingCharacter.CanDie()))
                     {
                         GlobalControl.Main.HoldingCharacter.PutDown(S);
                     }
@@ -71,6 +71,8 @@ namespace THAN
             Slot Temp = null;
             foreach (Slot S in GlobalControl.Main.Slots)
             {
+                if (S == GlobalControl.Main.SacrificeSlot && !GlobalControl.Main.GetSacrificeActive())
+                    continue;
                 float b = (S.GetPosition() - GetPosition()).magnitude;
                 if (b < a)
                 {

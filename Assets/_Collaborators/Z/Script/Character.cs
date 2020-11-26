@@ -11,13 +11,12 @@ namespace THAN
         public string Name;
         [Space]
         public List<Event> CharacterEvents;
+        //public List<Event> FreeEvents;
         public Event RepeatEvent;
         public int EventCoolRate;
         public int EventCoolDown;
-        [Space]
-        public List<string> Barks;
-        public int CurrentBarkIndex;
-        public int BarkFailedTime;
+        public int StartTime = -1;
+        public bool Active;
         [Space]
         public TextMeshPro VitalityText;
         public TextMeshPro PassionText;
@@ -26,6 +25,7 @@ namespace THAN
         public GameObject PassionLimit;
         public GameObject ReasonLimit;
         public GameObject Outline;
+        public GameObject Mask;
         [Space]
         public Slot CurrentSlot;
         public Pair CurrentPair;
@@ -33,6 +33,9 @@ namespace THAN
         public Vector2 TargetPosition;
         public AnimationCurve PositionCurve;
         public float PositionDelay;
+        public bool Highlighted;
+        public AnimationCurve HighlightedCurve;
+        public float HighlightedDelay;
         public float CurrentPositionTime;
         public float OriZ;
 
@@ -73,7 +76,7 @@ namespace THAN
             }
             else
             {
-                VitalityText.text = "?";
+                VitalityText.text = "??";
                 VitalityLimit.SetActive(false);
             }
 
@@ -87,7 +90,7 @@ namespace THAN
             }
             else
             {
-                PassionText.text = "?";
+                PassionText.text = "??";
                 PassionLimit.SetActive(false);
             }
 
@@ -101,36 +104,21 @@ namespace THAN
             }
             else
             {
-                ReasonText.text = "?";
+                ReasonText.text = "??";
                 ReasonLimit.SetActive(false);
             }
         }
 
-        public void TryBark()
+        public bool TryBark()
         {
-            if (BarkFailedTime >= 2 || Random.Range(0.01f, 0.99f) >= 0.5f)
-                Bark();
-            else
-                BarkFailedTime++;
-        }
-
-        public void Bark()
-        {
-            BarkFailedTime = 0;
-            CurrentBarkIndex++;
-            if (CurrentBarkIndex >= Barks.Count)
-                CurrentBarkIndex = 0;
-        }
-
-        public string GetBark()
-        {
-            return Barks[CurrentBarkIndex];
+            if (!GetComponent<Bark>() || !GetComponent<Bark>().CanBark())
+                return false;
+            GetComponent<Bark>().Effect();
+            return true;
         }
 
         public Event GetEvent()
         {
-            if (!GetPair() || !GetPartner())
-                return null;
             if (EventCoolDown > 0)
                 return null;
             if (CharacterEvents.Count <= 0 && !RepeatEvent)
@@ -148,6 +136,10 @@ namespace THAN
         public void OnTriggerEvent(Event E)
         {
             EventCoolDown = EventCoolRate;
+        }
+
+        public void AdvanceSequence(Event E)
+        {
             if (CharacterEvents.Contains(E))
                 CharacterEvents.Remove(E);
         }
@@ -192,12 +184,6 @@ namespace THAN
             {
                 SetHidden_Reason(false);
             }
-        }
-
-        public bool CanDie()
-        {
-            return GetVitality() <= GlobalControl.Main.GetVitalityLimit()
-                && GetPassion() <= GlobalControl.Main.GetPassionLimit() && GetReason() <= GlobalControl.Main.GetReasonLimit();
         }
 
         public void IniStat(float V, float P, float R)
@@ -249,6 +235,18 @@ namespace THAN
             P.Ini(this, C);
             P.SetPosition((CurrentSlot.GetPosition() + C.CurrentSlot.GetPosition()) * 0.5f);
             GlobalControl.Main.AddPair(P);
+
+            int b = Random.Range(0, 2);
+            if (b == 0)
+            {
+                if (!TryBark())
+                    C.TryBark();
+            }
+            else
+            {
+                if (!C.TryBark())
+                    TryBark();
+            }
         }
 
         public bool CanPair()
@@ -291,8 +289,10 @@ namespace THAN
         {
             OriPosition = transform.position;
             TargetPosition = Target;
-            PositionDelay = 0.15f;
-            CurrentPositionTime = PositionDelay;
+            if (!Highlighted)
+                CurrentPositionTime = PositionDelay;
+            else
+                CurrentPositionTime = HighlightedDelay;
         }
 
         public void SetPosition(Vector2 Target)
@@ -309,7 +309,7 @@ namespace THAN
                 if (CurrentPositionTime <= 0)
                 {
                     Vector2 b = Cursor.Main.GetPosition();
-                    transform.position = new Vector3(b.x, b.y, OriZ - 1);
+                    transform.position = new Vector3(b.x, b.y, OriZ - 4);
                     return;
                 }
                 else
@@ -318,14 +318,70 @@ namespace THAN
                 }
             }
 
-            float v = 1 - (CurrentPositionTime / PositionDelay);
+            float v;
+            if (!Highlighted)
+                v = 1 - (CurrentPositionTime / PositionDelay);
+            else
+                v = 1 - (CurrentPositionTime / HighlightedDelay);
             if (v > 1)
                 v = 1;
-            Vector2 a = OriPosition + (TargetPosition - OriPosition) * PositionCurve.Evaluate(v);
-            if (GlobalControl.Main.HoldingCharacter != this)
-                transform.position = new Vector3(a.x, a.y, OriZ);
+            Vector2 a;
+            if (!Highlighted)
+                a = OriPosition + (TargetPosition - OriPosition) * PositionCurve.Evaluate(v);
             else
+                a = OriPosition + (TargetPosition - OriPosition) * HighlightedCurve.Evaluate(v);
+            if (GlobalControl.Main.HoldingCharacter == this)
+                transform.position = new Vector3(a.x, a.y, OriZ - 4);
+            else if (CurrentSlot == GlobalControl.Main.SacrificeSlot)
+                transform.position = new Vector3(a.x, a.y, OriZ - 3);
+            else if (Highlighted)
                 transform.position = new Vector3(a.x, a.y, OriZ - 1);
+            else
+                transform.position = new Vector3(a.x, a.y, OriZ);
+        }
+
+        public void EndOfTurn()
+        {
+            EventCoolDown--;
+        }
+
+        public void ActivateMask()
+        {
+            Mask.SetActive(true);
+            GlobalControl.Main.MaskedCharacters.Add(this);
+        }
+
+        public void DisableMask()
+        {
+            Mask.SetActive(false);
+        }
+
+        public bool CanDie()
+        {
+            return GetVitality() <= GlobalControl.Main.GetVitalityLimit()
+                && GetPassion() <= GlobalControl.Main.GetPassionLimit() && GetReason() <= GlobalControl.Main.GetReasonLimit()
+                && !GetHidden_Vitality() && !GetHidden_Passion() && !GetHidden_Reason();
+        }
+
+        public void Death()
+        {
+            Remove();
+        }
+
+        public void Killed()
+        {
+            Remove();
+        }
+
+        public void Missing()
+        {
+            Remove();
+        }
+
+        public void Remove()
+        {
+            GlobalControl.Main.Characters.Remove(this);
+            Destroy(gameObject);
         }
 
         public static Character Find(string Name)

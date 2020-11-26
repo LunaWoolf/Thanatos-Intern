@@ -7,6 +7,7 @@ namespace THAN
     public class Slot : MonoBehaviour {
         public bool IniActive;
         public Vector2Int Position;
+        public Vector2 ERPosition;
         public Character CurrentCharacter;
 
         public void Awake()

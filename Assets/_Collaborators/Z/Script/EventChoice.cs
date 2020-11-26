@@ -5,10 +5,11 @@ using UnityEngine;
 namespace THAN
 {
     public class EventChoice : MonoBehaviour {
+        public bool TriggerSequence = true;
         [TextArea]
         public string Content;
 
-        public virtual void Effect(Pair P, out Event AddEvent)
+        public virtual void Effect(List<Character> Characters, out Event AddEvent)
         {
             AddEvent = null;
         }

@@ -14,15 +14,24 @@ namespace THAN
         public Slot SelectingSlot;
         public Character HoldingCharacter;
         [Space]
-        public List<TownEvent> TownEvents;
+        public Slot SacrificeSlot;
+        public List<int> SacrificeTimes;
+        [Space]
+        public EndTurnButton EndTurnAnim;
+        public SacrificeSlot SacrificeAnim;
+        public Animator BoardShadeAnim;
         public bool BoardActive;
         public bool IndividualEventActive;
         public bool TownEventActive;
+        public List<Character> MaskedCharacters;
+        public List<Character> ChangedCharacters;
+        public List<Pair> MaskedPairs;
         [Space]
         public EventRenderer IER;
         public EventRenderer TER;
         [Space]
-        public List<Character> StartCharacters;
+        public List<string> StartCharacters;
+        public List<TownEvent> TownEvents;
         [Space]
         public List<Character> Characters;
         public List<Pair> Pairs;
@@ -40,14 +49,20 @@ namespace THAN
 
         public void StartCharacterIni()
         {
-            foreach (Character C in StartCharacters)
+            foreach (string s in StartCharacters)
+            {
+                Character C = Character.Find(s);
                 GetNextSlot().AssignCharacter(C);
+                C.Active = true;
+            }
         }
 
         // Start is called before the first frame update
         void Start()
         {
             StartCharacterIni();
+            if (GetSacrificeActive())
+                SacrificeAnim.Active();
         }
 
         // Update is called once per frame
@@ -70,38 +85,104 @@ namespace THAN
             TownEventActive = false;
             foreach (Pair P in Pairs)
                 P.Effect();
-            float a = 0;
 
-            yield return new WaitForSeconds(1.2f);
+            if (GetSacrificeActive())
+                yield return SacrificeProcess();
 
-            yield return GenerateTownEvent();
-            while (a < 0.4f || TownEventActive)
+            PreGenerateEvent(out List<Character> NextList);
+            PreGenerateTownEvent(out Event NextTownEvent);
+            if (!NextTownEvent && NextList.Count <= 0)
             {
-                a += Time.deltaTime;
-                yield return 0;
+                EndTurnAnim.Next(1f);
+                while (EndTurnAnim.Animating)
+                    yield return 0;
             }
-
-            yield return new WaitForSeconds(1.2f);
-
-            yield return GenerateEvent();
-            while (a < 0.4f || IndividualEventActive)
+            else if (NextTownEvent)
             {
-                a += Time.deltaTime;
-                yield return 0;
+                EndTurnAnim.Next(0.33f);
+                while (EndTurnAnim.Animating)
+                    yield return 0;
+                yield return TownEventProcess(NextTownEvent);
+                if (NextList.Count <= 0)
+                {
+                    EndTurnAnim.Next(0.67f);
+                    while (EndTurnAnim.Animating)
+                        yield return 0;
+                }
+                else
+                {
+                    EndTurnAnim.Next(0.33f);
+                    while (EndTurnAnim.Animating)
+                        yield return 0;
+                    yield return IndividualEventProcess(NextList);
+                    EndTurnAnim.Next(0.34f);
+                    while (EndTurnAnim.Animating)
+                        yield return 0;
+                }
             }
-
-            yield return new WaitForSeconds(1.6f);
-
+            else
+            {
+                EndTurnAnim.Next(0.66f);
+                while (EndTurnAnim.Animating)
+                    yield return 0;
+                yield return IndividualEventProcess(NextList);
+                EndTurnAnim.Next(0.34f);
+                while (EndTurnAnim.Animating)
+                    yield return 0;
+            }
             CurrentTime++;
             BoardActive = true;
+            if (GetSacrificeActive())
+                SacrificeAnim.Active();
+            foreach (Character C in Characters)
+                C.EndOfTurn();
+            foreach (Character C in Characters)
+            {
+                if (!C.Active && C.StartTime <= CurrentTime)
+                {
+                    GetNextSlot().AssignCharacter(C);
+                    C.Active = true;
+                }
+            }
+        }
+
+        public IEnumerator SacrificeProcess()
+        {
+            SacrificeSlot.GetCharacter().Death();
+            SacrificeAnim.Disable();
+            yield return new WaitForSeconds(1f);
+        }
+
+        public IEnumerator TownEventProcess(Event NextTownEvent)
+        {
+            yield return GenerateTownEvent(NextTownEvent);
+            if (TownEventActive)
+            {
+                while (TownEventActive)
+                    yield return 0;
+                StartCoroutine("DisableBoardShade");
+            }
+            //yield return new WaitForSeconds(0.8f);
+        }
+
+        public IEnumerator IndividualEventProcess(List<Character> Characters)
+        {
+            yield return GenerateEvent(Characters);
+            if (IndividualEventActive)
+            {
+                while (IndividualEventActive)
+                    yield return 0;
+                StartCoroutine("DisableBoardShade");
+            }
+            //yield return new WaitForSeconds(0.8f);
         }
 
         public bool CanEndTurn()
         {
-            return GetBoardActive() && !HoldingCharacter;
+            return GetBoardActive() && !HoldingCharacter && (!GetSacrificeActive() || SacrificeSlot.GetCharacter());
         }
 
-        public IEnumerator GenerateTownEvent()
+        public void PreGenerateTownEvent(out Event NE)
         {
             Event E = null;
             foreach (TownEvent TE in TownEvents)
@@ -109,23 +190,84 @@ namespace THAN
                 if (TE.CanTrigger())
                     E = TE;
             }
-            if (!E)
-                yield break;
+            NE = E;
+        }
+
+        public IEnumerator GenerateTownEvent(Event E)
+        {
+            BoardShadeAnim.SetBool("Active", true);
+            yield return 0;
+            //yield return new WaitForSeconds(0.5f);
             TownEventActive = true;
             TER.Activate(E, null);
         }
 
-        public IEnumerator GenerateEvent()
+        public void PreGenerateEvent(out List<Character> NL)
         {
             List<Character> Cs = new List<Character>();
             foreach (Character c in Characters)
                 if (c.GetEvent())
                     Cs.Add(c);
-            if (Cs.Count <= 0)
-                yield break;
+            NL = Cs;
+        }
+
+        public IEnumerator GenerateEvent(List<Character> Cs)
+        {
             Character C = Cs[Random.Range(0, Cs.Count)];
             Event E = C.GetEvent();
             C.OnTriggerEvent(E);
+
+            BoardShadeAnim.SetBool("Active", true);
+            if (E.FreeSources.Count == 0)
+            {
+                Pair P = C.GetPair();
+                P.ActivateMask();
+                if ((P.GetCharacter(0).CurrentSlot.GetPosition().x < P.GetCharacter(1).CurrentSlot.GetPosition().x && P.GetCharacter(0).CurrentSlot.ERPosition.x < 0)
+                    || (P.GetCharacter(0).CurrentSlot.GetPosition().x > P.GetCharacter(1).CurrentSlot.GetPosition().x && P.GetCharacter(0).CurrentSlot.ERPosition.x > 0))
+                {
+                    Vector2 a = P.GetCharacter(0).CurrentSlot.GetPosition() + P.GetCharacter(0).CurrentSlot.ERPosition;
+                    IER.transform.position = new Vector3(a.x, a.y, IER.transform.position.z);
+                }
+                else if ((P.GetCharacter(0).CurrentSlot.GetPosition().x > P.GetCharacter(1).CurrentSlot.GetPosition().x && P.GetCharacter(1).CurrentSlot.ERPosition.x < 0)
+                    || (P.GetCharacter(0).CurrentSlot.GetPosition().x < P.GetCharacter(1).CurrentSlot.GetPosition().x && P.GetCharacter(1).CurrentSlot.ERPosition.x > 0))
+                {
+                    Vector2 a = P.GetCharacter(1).CurrentSlot.GetPosition() + P.GetCharacter(1).CurrentSlot.ERPosition;
+                    IER.transform.position = new Vector3(a.x, a.y, IER.transform.position.z);
+                }
+                else if (P.GetCharacter(0).CurrentSlot.GetPosition().x > P.GetCharacter(1).CurrentSlot.GetPosition().x)
+                {
+                    Vector2 a = P.GetCharacter(0).CurrentSlot.ERPosition;
+                    a.x = -a.x;
+                    Vector2 b = P.GetCharacter(0).CurrentSlot.GetPosition();
+                    IER.transform.position = new Vector3(a.x + b.x, a.y + b.y, IER.transform.position.z);
+                }
+                else
+                {
+                    Vector2 a = P.GetCharacter(1).CurrentSlot.ERPosition;
+                    a.x = -a.x;
+                    Vector2 b = P.GetCharacter(1).CurrentSlot.GetPosition();
+                    IER.transform.position = new Vector3(a.x + b.x, a.y + b.y, IER.transform.position.z);
+                }
+                //yield return new WaitForSeconds(0.5f);
+            }
+            else
+            {
+                Slot S = Character.Find(E.FreeSources[0]).CurrentSlot;
+                Vector2 a = S.ERPosition + S.GetPosition();
+                IER.transform.position = new Vector3(a.x, 2, IER.transform.position.z);
+                for (int i = 0; i < E.FreeSources.Count; i++)
+                {
+                    Character c = Character.Find(E.FreeSources[i]);
+                    ChangedCharacters.Add(c);
+                    c.ActivateMask();
+                    c.Highlighted = true;
+                }
+                yield return new WaitForSeconds(0.5f);
+                for (int i = 0; i < ChangedCharacters.Count; i++)
+                {
+                    ChangedCharacters[i].PositionChange(new Vector3(S.GetPosition().x, IER.AttachPositions[i], ChangedCharacters[i].transform.position.z));
+                }
+            }
             IndividualEventActive = true;
             IER.Activate(E, C.GetPair());
         }
@@ -136,6 +278,23 @@ namespace THAN
                 TownEventActive = false;
             else if (Index == 1)
                 IndividualEventActive = false;
+        }
+
+        public IEnumerator DisableBoardShade()
+        {
+            BoardShadeAnim.SetBool("Active", false);
+            foreach (Character C in ChangedCharacters)
+                C.PositionChange(C.CurrentSlot.GetPosition());
+            yield return new WaitForSeconds(0.6f);
+            foreach (Character C in MaskedCharacters)
+                C.DisableMask();
+            foreach (Pair P in MaskedPairs)
+                P.DisableMask();
+            foreach (Character C in ChangedCharacters)
+                C.Highlighted = false;
+            MaskedCharacters.Clear();
+            MaskedPairs.Clear();
+            ChangedCharacters.Clear();
         }
 
         public void AddPair(Pair P)
@@ -183,6 +342,8 @@ namespace THAN
             {
                 foreach (Slot S in L)
                 {
+                    if (S == SacrificeSlot)
+                        continue;
                     if (!S.GetCharacter())
                         return S;
                 }
@@ -201,7 +362,7 @@ namespace THAN
                 {
                     if (S == Ori)
                         a = true;
-                    if (a && !S.GetCharacter())
+                    if (a && S && !S.GetCharacter())
                         return S;
                 }
             }
@@ -210,9 +371,9 @@ namespace THAN
 
         public Slot GetSlot(int x, int y)
         {
-            if (y >= Grid.Count)
+            if (y >= Grid.Count || y < 0)
                 return null;
-            if (x >= Grid[y].Count)
+            if (x >= Grid[y].Count || x < 0)
                 return null;
             return Grid[y][x];
         }
@@ -252,6 +413,11 @@ namespace THAN
         public bool GetBoardActive()
         {
             return BoardActive;
+        }
+
+        public bool GetSacrificeActive()
+        {
+            return SacrificeTimes.Contains(CurrentTime);
         }
     }
 }
