@@ -21,6 +21,11 @@ namespace THAN
         public GameObject Ring;
         public float RingSpeed;
         [Space]
+        public AudioSource Sound;
+        public float MaxSoundVolume;
+        public float SoundSpeed;
+        public bool SoundActive;
+        [Space]
         public bool Animating;
 
         // Start is called before the first frame update
@@ -39,6 +44,18 @@ namespace THAN
             RingRotating = GlobalControl.Main.BoardActive;
             if (RingRotating)
                 Ring.transform.localEulerAngles = new Vector3(0, 0, Ring.transform.localEulerAngles.z + RingSpeed * Time.deltaTime);
+            if (SoundActive && Sound.volume < MaxSoundVolume)
+            {
+                Sound.volume += SoundSpeed * Time.deltaTime;
+                if (Sound.volume > MaxSoundVolume)
+                    Sound.volume = MaxSoundVolume;
+            }
+            else if (!SoundActive && Sound.volume > 0)
+            {
+                Sound.volume -= SoundSpeed * Time.deltaTime;
+                if (Sound.volume < 0)
+                    Sound.volume = 0;
+            }
         }
 
         public void Next(float Step)
@@ -56,6 +73,7 @@ namespace THAN
             float CircleITarget = CircleIOri + CircleISpeed * Step;
             float CircleIIOri = CircleII.transform.localEulerAngles.z;
             float CircleIITarget = CircleIIOri + CircleIISpeed * Step;
+            SoundActive = true;
             while (a < Step * StepTime)
             {
                 a += Time.deltaTime;
@@ -64,6 +82,7 @@ namespace THAN
                 CircleII.transform.localEulerAngles = new Vector3(0, 0, CircleIIOri + (CircleIITarget - CircleIIOri) * (a / (Step * StepTime)));
                 yield return 0;
             }
+            SoundActive = false;
             Animating = false;
         }
 

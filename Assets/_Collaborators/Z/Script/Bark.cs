@@ -31,7 +31,7 @@ namespace THAN
             CurrentBarkIndex++;
             if (CurrentBarkIndex >= Barks.Count)
                 CurrentBarkIndex = 0;
-            // Actual Bark Effect
+            GlobalControl.Main.Bark(GetBark());
         }
 
         public virtual string GetBark()

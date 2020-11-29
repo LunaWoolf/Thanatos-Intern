@@ -15,6 +15,7 @@ namespace THAN
         public TextMeshPro ContentText;
         public TextMeshPro AddContentText;
         public TextMeshPro NameText;
+        public TextMeshPro QuestionText;
         public ChoiceRenderer CRI;
         public ChoiceRenderer CRII;
         public ChoiceRenderer CRIII;
@@ -44,6 +45,7 @@ namespace THAN
                 ContentText.text = "";
                 AddContentText.text = "";
                 NameText.text = "";
+                QuestionText.text = "";
                 CRI.Render(null);
                 CRII.Render(null);
                 CRIII.Render(null);
@@ -58,6 +60,10 @@ namespace THAN
                 NameText.text = "";
             else
                 NameText.text = GetEvent().GetSource().GetName();
+            //if (GetCurrentEC())
+                //QuestionText.text = GetCurrentEC().EffectText;
+            //else
+                QuestionText.text = GetEvent().AddContent;
             CRI.Render(GetEvent().GetChoices()[0]);
             CRII.Render(GetEvent().GetChoices()[1]);
             if (GetAddEvent())
@@ -187,6 +193,17 @@ namespace THAN
         public Pair GetSourcePair()
         {
             return CurrentPair;
+        }
+
+        public EventChoice GetCurrentEC()
+        {
+            if (CRI.MouseOnDelay > 0)
+                return CRI.CurrentEC;
+            if (CRII.MouseOnDelay > 0)
+                return CRII.CurrentEC;
+            if (CRIII.MouseOnDelay > 0)
+                return CRIII.CurrentEC;
+            return null;
         }
     }
 }

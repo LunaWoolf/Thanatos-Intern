@@ -8,6 +8,8 @@ namespace THAN
     public class ChoiceRenderer : MonoBehaviour {
         public bool Active;
         public bool MouseOn;
+        public float MouseOnDelay;
+        public EventChoice CurrentEC;
         [Space]
         public int Index;
         public EventRenderer ER;
@@ -26,7 +28,9 @@ namespace THAN
         // Update is called once per frame
         void Update()
         {
-
+            MouseOnDelay -= Time.deltaTime;
+            if (MouseOn)
+                MouseOnDelay = 0.4f;
         }
 
         public void Render(EventChoice EC)
@@ -38,8 +42,22 @@ namespace THAN
                 return;
             }
 
-            EmptyText.text = EC.GetContent();
-            SelectingText.text = EC.GetContent();
+            CurrentEC = EC;
+            if (EC.EffectText != "")
+            {
+                EmptyText.text = EC.GetContent() + "  [" + EC.EffectText + "]";
+                SelectingText.text = EC.GetContent() + "  [" + EC.EffectText + "]";
+            }
+            else if (EC.GetContent() == "")
+            {
+                EmptyText.text = "[" + EC.EffectText + "]";
+                SelectingText.text = "[" + EC.EffectText + "]";
+            }
+            else
+            {
+                EmptyText.text = EC.GetContent();
+                SelectingText.text = EC.GetContent();
+            }
         }
 
         public void Activate(EventChoice EC)
@@ -64,6 +82,7 @@ namespace THAN
         {
             MouseOn = true;
             Anim.SetBool("Selecting", true);
+            GlobalControl.Main.PlaySound("Hover");
         }
 
         public void OnMouseExit()
@@ -75,7 +94,10 @@ namespace THAN
         public void OnMouseDown()
         {
             if (Active)
+            {
                 ER.Decide(Index);
+                GlobalControl.Main.PlaySound("Select");
+            }
         }
     }
 }

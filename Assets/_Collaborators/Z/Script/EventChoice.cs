@@ -8,6 +8,7 @@ namespace THAN
         public bool TriggerSequence = true;
         [TextArea]
         public string Content;
+        public string EffectText;
 
         public virtual void Effect(List<Character> Characters, out Event AddEvent)
         {

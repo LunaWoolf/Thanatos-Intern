@@ -109,6 +109,12 @@ namespace THAN
             }
         }
 
+        public void Activate()
+        {
+            Active = true;
+            Anim.SetTrigger("Activate");
+        }
+
         public bool TryBark()
         {
             if (!GetComponent<Bark>() || !GetComponent<Bark>().CanBark())
@@ -236,7 +242,7 @@ namespace THAN
             P.SetPosition((CurrentSlot.GetPosition() + C.CurrentSlot.GetPosition()) * 0.5f);
             GlobalControl.Main.AddPair(P);
 
-            int b = Random.Range(0, 2);
+            /*int b = Random.Range(0, 2);
             if (b == 0)
             {
                 if (!TryBark())
@@ -246,7 +252,8 @@ namespace THAN
             {
                 if (!C.TryBark())
                     TryBark();
-            }
+            }*/
+            C.TryBark();
         }
 
         public bool CanPair()
@@ -265,7 +272,6 @@ namespace THAN
         {
             PositionChange(S.GetPosition());
             CurrentSlot = S;
-            TryBark();
         }
 
         public void PickUp()
@@ -300,6 +306,7 @@ namespace THAN
             OriPosition = Target;
             TargetPosition = Target;
             CurrentPositionTime = 0f;
+            PositionUpdate();
         }
 
         public void PositionUpdate()
@@ -380,8 +387,11 @@ namespace THAN
 
         public void Remove()
         {
+            if (GetPair())
+                GlobalControl.Main.RemovePair(GetPair());
+            Anim.SetTrigger("Death");
             GlobalControl.Main.Characters.Remove(this);
-            Destroy(gameObject);
+            Destroy(gameObject, 3);
         }
 
         public static Character Find(string Name)

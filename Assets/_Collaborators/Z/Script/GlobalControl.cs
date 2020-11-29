@@ -8,6 +8,7 @@ namespace THAN
     public class GlobalControl : MonoBehaviour {
         public static GlobalControl Main;
         public int CurrentTime;
+        public int VictoryTime;
         [Space]
         public List<List<Slot>> Grid;
         public List<Slot> Slots;
@@ -20,6 +21,11 @@ namespace THAN
         public EndTurnButton EndTurnAnim;
         public SacrificeSlot SacrificeAnim;
         public Animator BoardShadeAnim;
+        public TextMeshPro TimeText;
+        public GameObject BarkTextPrefab;
+        public GameObject LastBarkText;
+        public Animator FadeOut;
+        public int CurrentRenderTime = 0;
         public bool BoardActive;
         public bool IndividualEventActive;
         public bool TownEventActive;
@@ -37,10 +43,17 @@ namespace THAN
         public List<Pair> Pairs;
         [Space]
         public GameObject PairPrefab;
+        public GameObject PickUpSound;
+        public GameObject PutDownSound;
+        public GameObject EventSound;
+        public GameObject HoverSound;
+        public GameObject SelectSound;
         [Space]
         public int VitalityLimit = 10;
         public int PassionLimit = 10;
         public int ReasonLimit = 10;
+        [HideInInspector]
+        public bool AlreadyDead;
 
         public void Awake()
         {
@@ -49,10 +62,25 @@ namespace THAN
 
         public void StartCharacterIni()
         {
-            foreach (string s in StartCharacters)
+            for (int i = 0; i < StartCharacters.Count; i++)
             {
-                Character C = Character.Find(s);
-                GetNextSlot().AssignCharacter(C);
+                Character C = Character.Find(StartCharacters[i]);
+                Slot S = null;
+                if (i == 0)
+                    S = Grid[0][0];
+                else if (i == 1)
+                    S = Grid[0][1];
+                else if (i == 2)
+                    S = Grid[1][0];
+                else if (i == 3)
+                    S = Grid[2][0];
+                else if (i == 4)
+                    S = Grid[0][5];
+                else if (i == 5)
+                    S = Grid[0][6];
+                else
+                    S = GetNextSlot();
+                S.AssignCharacter(C);
                 C.Active = true;
             }
         }
@@ -63,13 +91,43 @@ namespace THAN
             StartCharacterIni();
             if (GetSacrificeActive())
                 SacrificeAnim.Active();
+            NextRenderTime(0f);
+            if (CurrentTime <= 0)
+                StartCoroutine("StartProcess");
         }
 
         // Update is called once per frame
         void Update()
         {
-            if (Input.GetKeyDown(KeyCode.Space) && CanEndTurn())
-                EndOfTurn();
+            /*if (Input.GetKeyDown(KeyCode.Space) && CanEndTurn())
+                EndOfTurn();*/
+            if (CurrentTime >= VictoryTime)
+                End();
+        }
+
+        public IEnumerator StartProcess()
+        {
+            BoardActive = false;
+            IndividualEventActive = false;
+            TownEventActive = false;
+            PreGenerateTownEvent(out Event NextTownEvent);
+            yield return TownEventProcess(NextTownEvent);
+            CurrentTime++;
+            BoardActive = true;
+            if (GetSacrificeActive())
+                SacrificeAnim.Active();
+            foreach (Character C in Characters)
+                C.EndOfTurn();
+            foreach (Character C in Characters)
+            {
+                if (!C.Active && C.StartTime <= CurrentTime)
+                {
+                    C.Activate();
+                    Slot S = GetNextSlot();
+                    C.SetPosition(S.GetPosition());
+                    S.AssignCharacter(C);
+                }
+            }
         }
 
         public void EndOfTurn()
@@ -86,14 +144,15 @@ namespace THAN
             foreach (Pair P in Pairs)
                 P.Effect();
 
-            if (GetSacrificeActive())
-                yield return SacrificeProcess();
-
             PreGenerateEvent(out List<Character> NextList);
             PreGenerateTownEvent(out Event NextTownEvent);
             if (!NextTownEvent && NextList.Count <= 0)
             {
+                if (GetSacrificeActive())
+                    yield return SacrificeProcess();
                 EndTurnAnim.Next(1f);
+                //NextRenderTime(0.33f * EndTurnAnim.StepTime);
+                //NextRenderTime(0.67f * EndTurnAnim.StepTime);
                 while (EndTurnAnim.Animating)
                     yield return 0;
             }
@@ -102,10 +161,13 @@ namespace THAN
                 EndTurnAnim.Next(0.33f);
                 while (EndTurnAnim.Animating)
                     yield return 0;
+                //NextRenderTime(0f);
+                PlaySound("Event");
                 yield return TownEventProcess(NextTownEvent);
                 if (NextList.Count <= 0)
                 {
                     EndTurnAnim.Next(0.67f);
+                    NextRenderTime(0.33f * EndTurnAnim.StepTime);
                     while (EndTurnAnim.Animating)
                         yield return 0;
                 }
@@ -114,6 +176,8 @@ namespace THAN
                     EndTurnAnim.Next(0.33f);
                     while (EndTurnAnim.Animating)
                         yield return 0;
+                    //NextRenderTime(0f);
+                    PlaySound("Event");
                     yield return IndividualEventProcess(NextList);
                     EndTurnAnim.Next(0.34f);
                     while (EndTurnAnim.Animating)
@@ -122,9 +186,14 @@ namespace THAN
             }
             else
             {
+                if (GetSacrificeActive())
+                    yield return SacrificeProcess();
                 EndTurnAnim.Next(0.66f);
+                //NextRenderTime(0.33f * EndTurnAnim.StepTime);
                 while (EndTurnAnim.Animating)
                     yield return 0;
+                //NextRenderTime(0f);
+                PlaySound("Event");
                 yield return IndividualEventProcess(NextList);
                 EndTurnAnim.Next(0.34f);
                 while (EndTurnAnim.Animating)
@@ -132,6 +201,7 @@ namespace THAN
             }
             CurrentTime++;
             BoardActive = true;
+            NextRenderTime(0f);
             if (GetSacrificeActive())
                 SacrificeAnim.Active();
             foreach (Character C in Characters)
@@ -140,10 +210,13 @@ namespace THAN
             {
                 if (!C.Active && C.StartTime <= CurrentTime)
                 {
-                    GetNextSlot().AssignCharacter(C);
-                    C.Active = true;
+                    C.Activate();
+                    Slot S = GetNextSlot();
+                    C.SetPosition(S.GetPosition());
+                    S.AssignCharacter(C);
                 }
             }
+            //PlaySound("Event");
         }
 
         public IEnumerator SacrificeProcess()
@@ -155,6 +228,9 @@ namespace THAN
 
         public IEnumerator TownEventProcess(Event NextTownEvent)
         {
+            if (GetSacrificeActive())
+                yield return SacrificeProcess();
+
             yield return GenerateTownEvent(NextTownEvent);
             if (TownEventActive)
             {
@@ -280,6 +356,57 @@ namespace THAN
                 IndividualEventActive = false;
         }
 
+        public void NextRenderTime(float Delay)
+        {
+            if (Delay > 0)
+            {
+                StartCoroutine(NextRenderTimeIE(Delay));
+                return;
+            }
+
+            CurrentRenderTime += 1;
+            int Year = 1997;
+            int a = CurrentRenderTime;
+            while (a > 12)
+            {
+                Year++;
+                a -= 12;
+            }
+            string Month = "";
+            if (a == 1)
+                Month = "Jan";
+            else if (a == 2)
+                Month = "Feb";
+            else if (a == 3)
+                Month = "Mar";
+            else if (a == 4)
+                Month = "Apr";
+            else if (a == 5)
+                Month = "May";
+            else if (a == 6)
+                Month = "Jun";
+            else if (a == 7)
+                Month = "Jul";
+            else if (a == 8)
+                Month = "Aug";
+            else if (a == 9)
+                Month = "Sep";
+            else if (a == 10)
+                Month = "Oct";
+            else if (a == 11)
+                Month = "Nov";
+            else if (a == 12)
+                Month = "Dec";
+            TimeText.text = Year + " " + Month;
+        }
+
+        public IEnumerator NextRenderTimeIE(float Delay)
+        {
+            print("StartDelay " + Delay);
+            yield return new WaitForSeconds(Delay);
+            NextRenderTime(0f);
+        }
+
         public IEnumerator DisableBoardShade()
         {
             BoardShadeAnim.SetBool("Active", false);
@@ -311,6 +438,15 @@ namespace THAN
             Pairs.Remove(P);
             P.gameObject.SetActive(false);
             Destroy(P.gameObject, 3f);
+        }
+
+        public void Bark(string Value)
+        {
+            if (LastBarkText)
+                LastBarkText.GetComponent<BarkTextAnim>().End();
+            LastBarkText = Instantiate(BarkTextPrefab);
+            LastBarkText.GetComponent<BarkTextAnim>().Render('"'.ToString() + Value + '"'.ToString());
+            Destroy(LastBarkText, 5);
         }
 
         public void SlotExchange(Slot A, Slot B)
@@ -418,6 +554,64 @@ namespace THAN
         public bool GetSacrificeActive()
         {
             return SacrificeTimes.Contains(CurrentTime);
+        }
+
+        public bool HaveSacrifice()
+        {
+            for (int i = Characters.Count - 1; i >= 0; i--)
+            {
+                if (Characters[i].Active && Characters[i].CanDie())
+                    return true;
+            }
+            return false;
+        }
+
+        public void PlaySound(string Key)
+        {
+            GameObject Prefab = null;
+            if (Key == "PickUp")
+                Prefab = PickUpSound;
+            else if (Key == "PutDown")
+                Prefab = PutDownSound;
+            else if (Key == "Hover")
+                Prefab = HoverSound;
+            else if (Key == "Select")
+                Prefab = SelectSound;
+            else if (Key == "Event")
+                Prefab = EventSound;
+            GameObject G = Instantiate(Prefab);
+            Destroy(G, 5);
+        }
+
+        public void Retry()
+        {
+            if (AlreadyDead)
+                return;
+            AlreadyDead = true;
+            StartCoroutine("RetryIE");
+        }
+
+        public IEnumerator RetryIE()
+        {
+            FadeOut.SetTrigger("Play");
+            yield return new WaitForSeconds(0.6f);
+            UnityEngine.SceneManagement.SceneManager.LoadSceneAsync("Prototype");
+        }
+
+        public void End()
+        {
+            if (AlreadyDead)
+                return;
+            AlreadyDead = true;
+            PlaySound("Event");
+            StartCoroutine("EndIE");
+        }
+
+        public IEnumerator EndIE()
+        {
+            FadeOut.SetTrigger("Play");
+            yield return new WaitForSeconds(1.6f);
+            UnityEngine.SceneManagement.SceneManager.LoadSceneAsync("End");
         }
     }
 }

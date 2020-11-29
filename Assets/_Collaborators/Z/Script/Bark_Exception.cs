@@ -16,16 +16,16 @@ namespace THAN
             if (C.GetPair() && C.GetPartner().GetName() != ExceptionKey && C.GetPartner().GetName() != ExceptionKeyII)
             {
                 CurrentSpecialBarkIndex++;
-                if (CurrentSpecialBarkIndex >= Barks.Count)
+                if (CurrentSpecialBarkIndex >= SpecialBarks.Count)
                     CurrentSpecialBarkIndex = 0;
-                // Actual Bark Effect
+                GlobalControl.Main.Bark(SpecialBarks[CurrentSpecialBarkIndex]);
             }
             else
             {
                 CurrentBarkIndex++;
                 if (CurrentBarkIndex >= Barks.Count)
                     CurrentBarkIndex = 0;
-                // Actual Bark Effect
+                GlobalControl.Main.Bark(GetBark());
             }
         }
     }

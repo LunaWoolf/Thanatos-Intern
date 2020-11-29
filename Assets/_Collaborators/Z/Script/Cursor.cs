@@ -43,6 +43,7 @@ namespace THAN
                 {
                     Character C = GlobalControl.Main.GetSelectingCharacter();
                     C.PickUp();
+                    GlobalControl.Main.PlaySound("PickUp");
                 }
             }
             else
@@ -52,6 +53,7 @@ namespace THAN
                     if (GlobalControl.Main.GetSelectingCharacter().CanPair())
                     {
                         GlobalControl.Main.GetSelectingCharacter().CreatePair(GlobalControl.Main.HoldingCharacter);
+                        GlobalControl.Main.PlaySound("PutDown");
                     }
                 }
                 else
@@ -59,7 +61,10 @@ namespace THAN
                     Slot S = GetSelectingSlot();
                     if (!S.GetCharacter() && (S != GlobalControl.Main.SacrificeSlot || GlobalControl.Main.HoldingCharacter.CanDie()))
                     {
-                        GlobalControl.Main.HoldingCharacter.PutDown(S);
+                        Character C = GlobalControl.Main.HoldingCharacter;
+                        C.PutDown(S);
+                        C.TryBark();
+                        GlobalControl.Main.PlaySound("PutDown");
                     }
                 }
             }

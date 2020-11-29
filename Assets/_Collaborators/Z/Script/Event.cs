@@ -10,8 +10,10 @@ namespace THAN
         public List<string> FreeSources;
         [Space]
         public string RequiredKey;
+        public int StartTime = -1;
         [TextArea]
         public string Content;
+        public string AddContent;
         public bool DisplaySource;
         public List<EventChoice> Choices;
 
@@ -29,6 +31,8 @@ namespace THAN
         
         public virtual bool Pass(Pair P)
         {
+            if (GlobalControl.Main.CurrentTime < StartTime)
+                return false;
             if (!P && FreeSources.Count <= 0)
                 return false;
             foreach (string s in FreeSources)
